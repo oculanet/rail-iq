@@ -1,0 +1,454 @@
+<title>DC Traction Power Model</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+/* Layout: engineering drawing sheet — title block, tabbed input panel, results as drawing panels below */
+:root{
+  --paper:#f3f4ef; --panel:#fcfcfa; --ink:#1c2631; --ink2:#4d5a67; --ink3:#7a8592; --rule:#cfd4cb; --grid:#e4e7df;
+  --accent:#b1531b; --accent-soft:#f3e2d6; --up:#1d6c88; --dn:#7a4aa0; --tss:#b1531b;
+  --pass:#1b7442; --pass-soft:#dcefe2; --fail:#b3261e; --fail-soft:#f8dedb; --warn:#9a6400; --warn-soft:#f6ead2;
+  --focus:#1d6c88; --input:#ffffff; --chg:#fff4c9;
+  --f-disp:'IBM Plex Sans Condensed','Arial Narrow',Arial,sans-serif;
+  --f-body:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+  --f-mono:'IBM Plex Mono',ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#11161b; --panel:#171d23; --ink:#e3e8ec; --ink2:#a9b4be; --ink3:#7f8a95; --rule:#2d3640; --grid:#222a32;
+  --accent:#e0874f; --accent-soft:#3a2619; --up:#5db3d3; --dn:#b38be0; --tss:#e0874f;
+  --pass:#52c07f; --pass-soft:#16301f; --fail:#f2756c; --fail-soft:#3b1c1a; --warn:#e2b04c; --warn-soft:#352a14;
+  --focus:#5db3d3; --input:#0f1418; --chg:#3a3313; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#11161b; --panel:#171d23; --ink:#e3e8ec; --ink2:#a9b4be; --ink3:#7f8a95; --rule:#2d3640; --grid:#222a32;
+  --accent:#e0874f; --accent-soft:#3a2619; --up:#5db3d3; --dn:#b38be0; --tss:#e0874f;
+  --pass:#52c07f; --pass-soft:#16301f; --fail:#f2756c; --fail-soft:#3b1c1a; --warn:#e2b04c; --warn-soft:#352a14;
+  --focus:#5db3d3; --input:#0f1418; --chg:#3a3313; color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--paper);color:var(--ink);font:14px/1.45 var(--f-body);padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:16px 48px}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.sheet{max-width:1480px;margin:0 auto;display:flex;flex-direction:column;gap:18px}
+h1,h2,h3{font-family:var(--f-disp);text-wrap:balance;margin:0;letter-spacing:.01em}
+h2{font-size:19px;font-weight:600}
+h3{font-size:15px;font-weight:600}
+.mono,.num{font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.lbl{font:600 11px/1.2 var(--f-disp);text-transform:uppercase;letter-spacing:.08em;color:var(--ink3)}
+small,.muted{color:var(--ink2)}
+a{color:var(--up)}
+button,.btn{font:500 13px var(--f-body);border:1px solid var(--rule);background:var(--panel);color:var(--ink);padding:7px 12px;border-radius:4px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+button:hover,.btn:hover{border-color:var(--ink3)}
+button.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+button.accent{background:var(--accent);color:#fff;border-color:var(--accent)}
+button:disabled{opacity:.5;cursor:default}
+button.sm{padding:3px 8px;font-size:12px}
+button.icon{padding:3px 7px;line-height:1}
+:focus-visible{outline:2px solid var(--focus);outline-offset:2px}
+input,select,textarea{font:13px var(--f-mono);color:var(--ink);background:var(--input);border:1px solid var(--rule);border-radius:3px;padding:5px 7px;min-width:0}
+input[type=number]{font-variant-numeric:tabular-nums}
+input[type=checkbox]{width:16px;height:16px;accent-color:var(--accent)}
+textarea{width:100%;min-height:90px;resize:vertical}
+input.chg,select.chg{background:var(--chg)}
+/* title block */
+.titleblock{display:grid;grid-template-columns:minmax(0,2.2fr) repeat(4,minmax(0,1fr));border:1.5px solid var(--ink);background:var(--panel)}
+.titleblock>div{padding:10px 12px;border-left:1px solid var(--ink);min-width:0}
+.titleblock>div:first-child{border-left:0}
+.titleblock .val{font:600 15px var(--f-disp);margin-top:3px;overflow-wrap:anywhere}
+.titleblock h1{font-size:24px;font-weight:700;line-height:1.15}
+.titleblock input.ti{font:600 15px var(--f-disp);border:0;border-bottom:1px dashed var(--rule);background:transparent;padding:2px 0;width:100%;border-radius:0}
+.titleblock input.ti.big{font:700 22px var(--f-disp)}
+@media (max-width:900px){.titleblock{grid-template-columns:1fr 1fr}.titleblock>div{border-left:0;border-top:1px solid var(--ink)}.titleblock>div:first-child{grid-column:1/-1;border-top:0}}
+/* toolbar */
+.toolbar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--paper);padding:8px 0;border-bottom:1px solid var(--rule)}
+.toolbar .grow{flex:1}
+@media (max-width:700px){.toolbar{position:static}}
+.status{display:inline-flex;align-items:center;gap:8px;font-size:13px}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--ink3);display:inline-block}
+.dot.ok{background:var(--pass)}.dot.bad{background:var(--fail)}.dot.busy{background:var(--warn);animation:pulse 1s infinite}
+@keyframes pulse{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.dot.busy{animation:none}}
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:2px}
+.panel>header{display:flex;flex-wrap:wrap;gap:10px;align-items:baseline;justify-content:space-between;padding:12px 16px;border-bottom:1px solid var(--rule)}
+.panel>.body{padding:14px 16px;display:flex;flex-direction:column;gap:14px;min-width:0}
+.panel header .ref{font:500 11px var(--f-mono);color:var(--ink3)}
+.tabs{display:flex;flex-wrap:wrap;border-bottom:1px solid var(--rule);padding:0 8px;gap:2px}
+.tabs button{border:0;border-bottom:3px solid transparent;border-radius:0;background:transparent;padding:10px 12px;font:600 13px var(--f-disp);letter-spacing:.02em;color:var(--ink2)}
+.tabs button[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tabpane{padding:16px;display:flex;flex-direction:column;gap:16px;min-width:0}
+.fields{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:10px 16px}
+.field{display:flex;flex-direction:column;gap:3px;min-width:0}
+.field label{font-size:12px;color:var(--ink2)}
+.field .in{display:flex;align-items:center;gap:6px}
+.field .in input,.field .in select{flex:1;width:100%}
+.field .unit{font:12px var(--f-mono);color:var(--ink3);min-width:28px}
+.group{border:1px solid var(--grid);border-radius:2px;padding:12px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.group>h3{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.cols2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:16px}
+.cols3{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:16px}
+.note{font-size:12.5px;color:var(--ink2);max-width:80ch}
+.drop{border:1.5px dashed var(--rule);border-radius:3px;padding:12px;display:flex;flex-wrap:wrap;gap:10px;align-items:center;justify-content:space-between}
+.drop.over{border-color:var(--accent);background:var(--accent-soft)}
+/* tables */
+.tw{overflow-x:auto;max-width:100%;border:1px solid var(--grid)}
+table{border-collapse:collapse;width:100%;font-size:12.5px}
+th{font:600 12px/1.25 var(--f-disp);letter-spacing:.01em;color:var(--ink2);text-align:left;padding:7px 8px;border-bottom:1px solid var(--rule);background:var(--paper);position:sticky;top:0;vertical-align:bottom}
+td{padding:4px 8px;border-bottom:1px solid var(--grid);vertical-align:middle}
+td.n,th.n{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.et td{padding:2px 4px}
+.et input,.et select{width:100%;padding:3px 5px;font-size:12.5px}
+.et input[type=number]{min-width:72px}
+.et input.w-name{min-width:90px}
+.scroll{max-height:340px;overflow:auto}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--grid)}
+tr.sel td{background:var(--accent-soft)}
+.chip{display:inline-block;white-space:nowrap;font:600 11px var(--f-disp);letter-spacing:.06em;padding:2px 7px;border-radius:2px;text-transform:uppercase}
+.chip.pass{background:var(--pass-soft);color:var(--pass)}
+.chip.fail{background:var(--fail-soft);color:var(--fail)}
+.chip.warn{background:var(--warn-soft);color:var(--warn)}
+.chip.off{background:var(--grid);color:var(--ink2)}
+.bar{position:relative;height:8px;background:var(--grid);min-width:70px;border-radius:1px}
+.bar>i{position:absolute;left:0;top:0;bottom:0;background:var(--up);border-radius:1px}
+.bar>i.hot{background:var(--warn)}.bar>i.over{background:var(--fail)}
+.bar>b{position:absolute;top:-2px;bottom:-2px;width:1.5px;background:var(--ink)}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px}
+.card{border:1px solid var(--rule);background:var(--panel);padding:10px 12px;display:flex;flex-direction:column;gap:4px;border-top:3px solid var(--ink3);min-width:0}
+.card.ok{border-top-color:var(--pass)}.card.bad{border-top-color:var(--fail)}.card.warn{border-top-color:var(--warn)}
+.card .v{font:600 24px/1.1 var(--f-mono);font-variant-numeric:tabular-nums}
+.card .v small{font-size:13px;color:var(--ink2);font-weight:400}
+.card .s{font-size:12px;color:var(--ink2)}
+/* drawings */
+.drawing{width:100%;overflow-x:auto;border:1px solid var(--grid);background:var(--panel)}
+.drawing svg{display:block;min-width:900px;width:100%;height:auto}
+.chartbox{position:relative;height:300px;min-width:0}
+.chartbox.tall{height:380px}
+.chartbox.short{height:220px}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink2);align-items:center}
+.legend i{display:inline-block;width:14px;height:3px;margin-right:5px;vertical-align:middle}
+.tsspick{display:flex;flex-wrap:wrap;gap:6px}
+.tsspick label{display:inline-flex;gap:4px;align-items:center;font-size:12px;border:1px solid var(--rule);padding:2px 7px;border-radius:2px;cursor:pointer}
+.log{font:12px/1.5 var(--f-mono);background:var(--paper);border:1px solid var(--grid);padding:8px 10px;max-height:180px;overflow:auto;white-space:pre-wrap}
+.log .w{color:var(--warn)}.log .e{color:var(--fail)}.log .o{color:var(--pass)}
+.thumbs{display:flex;flex-wrap:wrap;gap:8px}
+.thumbs button{padding:4px;flex-direction:column;align-items:flex-start;font-size:11px}
+.thumbs img{width:150px;height:96px;object-fit:contain;background:#fff;border:1px solid var(--grid)}
+/* modal */
+.modal{position:fixed;inset:0;background:rgba(10,14,18,.55);z-index:40;display:flex;align-items:flex-start;justify-content:center;padding:calc(env(safe-area-inset-top,0px) + 20px) max(12px,env(safe-area-inset-right,0px)) 20px max(12px,env(safe-area-inset-left,0px));overflow:auto}
+.modal .box{background:var(--panel);border:1px solid var(--rule);max-width:1180px;width:100%;display:flex;flex-direction:column}
+.modal .box>header{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid var(--rule);gap:8px}
+.digi{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;padding:16px}
+@media (max-width:900px){.digi{grid-template-columns:1fr}}
+.digi canvas{width:100%;height:auto;border:1px solid var(--grid);background:#fff;cursor:crosshair;touch-action:none}
+.seg{display:inline-flex;border:1px solid var(--rule);border-radius:3px;overflow:hidden}
+.seg button{border:0;border-radius:0;border-right:1px solid var(--rule)}
+.seg button:last-child{border-right:0}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(env(safe-area-inset-bottom,0px) + 18px);background:var(--ink);color:var(--paper);padding:9px 14px;border-radius:3px;font-size:13px;z-index:60;max-width:calc(100% - 32px)}
+details summary{cursor:pointer;font:600 13px var(--f-disp);color:var(--ink2)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:4px 14px;font-size:13px}
+.kv dt{color:var(--ink2)}.kv dd{margin:0;font-family:var(--f-mono)}
+.method{columns:2 360px;column-gap:28px;font-size:13px;color:var(--ink2)}
+.method p{margin:0 0 10px;break-inside:avoid}
+.method b{color:var(--ink)}
+.progress{height:4px;background:var(--grid);width:160px;position:relative}
+.progress i{position:absolute;inset:0 auto 0 0;background:var(--accent)}
+.navrow{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:12.5px}
+.navrow a{color:var(--ink2);text-decoration:none;border-bottom:1px dotted var(--ink3)}
+</style>
+
+<div class="sheet">
+  <section class="titleblock" aria-label="Title block">
+    <div>
+      <div class="lbl">Project</div>
+      <input class="ti big" id="p_name" data-path="project.name" aria-label="Project name">
+      <div class="muted" style="font-size:12px;margin-top:4px">DC traction power simulation and equipment sizing · train run + network load flow, second by second</div>
+    </div>
+    <div><div class="lbl">System</div><input class="ti" id="p_system" data-path="project.system" aria-label="System"></div>
+    <div><div class="lbl">Document ref.</div><input class="ti" id="p_ref" data-path="project.ref" aria-label="Document reference"></div>
+    <div><div class="lbl">Scenario</div><div class="val" id="tb_scen">Normal service</div></div>
+    <div><div class="lbl">Result</div><div class="val" id="tb_res">not run</div></div>
+  </section>
+
+  <div class="toolbar" role="toolbar" aria-label="Model actions">
+    <button class="primary" id="btnRun">Run simulation</button>
+    <label class="row" style="gap:6px;font-size:12.5px"><input type="checkbox" id="autoRun" checked> Re-run when inputs change</label>
+    <span class="lbl" style="margin-left:6px">Scenario</span>
+    <select id="scenSel" aria-label="Scenario"></select>
+    <button id="btnDesign">Design check, all cases</button>
+    <span class="status" id="status"><span class="dot" id="statDot"></span><span id="statTxt">Ready</span></span>
+    <span class="grow"></span>
+    <button id="btnExportIn" title="Inputs as JSON; the Python model reads the same file">Export inputs</button>
+    <label class="btn" for="importIn">Import inputs</label><input type="file" id="importIn" accept=".json,application/json" hidden>
+    <button id="btnExportRes">Export results (Excel)</button>
+    <button id="btnReset">Reset to sample</button>
+  </div>
+
+  <!-- ============ INPUTS ============ -->
+  <section class="panel" aria-labelledby="inHead">
+    <header><h2 id="inHead">Input data</h2><span class="ref">All values editable · stored in this browser · "Export inputs" saves them for the Python model</span></header>
+    <div class="tabs" role="tablist" id="tabs">
+      <button role="tab" data-tab="t_tracks" aria-selected="true" id="tab_tracks">Tracks &amp; service</button>
+      <button role="tab" data-tab="t_tss" aria-selected="false" id="tab_tss">Traction substations</button>
+      <button role="tab" data-tab="t_train" aria-selected="false" id="tab_train">Train data</button>
+      <button role="tab" data-tab="t_align" aria-selected="false" id="tab_align">Alignment</button>
+      <button role="tab" data-tab="t_elec" aria-selected="false" id="tab_elec">Electrical &amp; limits</button>
+      <button role="tab" data-tab="t_sim" aria-selected="false" id="tab_sim">Simulation &amp; cases</button>
+      <button role="tab" data-tab="t_studies" aria-selected="false" id="tab_studies">AC supply, fault, harmonics &amp; EMC</button>
+      <button role="tab" data-tab="t_more" aria-selected="false" id="tab_more">Additional details</button>
+    </div>
+
+    <div class="tabpane" id="t_tracks" role="tabpanel">
+      <div class="group">
+        <h3>Number of tracks</h3>
+        <div class="row">
+          <div class="field" style="width:150px"><label for="n_up">UP tracks (increasing chainage)</label><input type="number" min="0" max="8" step="1" id="n_up" data-path="track_gen.n_up"></div>
+          <div class="field" style="width:150px"><label for="n_dn">DOWN tracks</label><input type="number" min="0" max="8" step="1" id="n_dn" data-path="track_gen.n_down"></div>
+          <button id="btnTracks" class="accent" style="align-self:flex-end">Apply track count</button>
+        </div>
+        <p class="note">Each track has its own conductor rail. All tracks are fed from every substation through its feeders (paralleled at the TSS busbar). UP trains run from the lowest to the highest station; DOWN trains the other way. Skip-stop lists name stations a service runs through without stopping.</p>
+      </div>
+      <div class="tw"><table class="et" id="tblTracks"></table></div>
+    </div>
+
+    <div class="tabpane" id="t_tss" role="tabpanel" hidden>
+      <div class="group">
+        <h3>Generate substations</h3>
+        <div class="fields" id="f_tssgen"></div>
+        <div class="row"><button class="accent" id="btnGenTss">Generate TSS list</button><span class="note">Replaces the list below with evenly spaced substations. Edit or add rows afterwards for irregular spacing.</span></div>
+      </div>
+      <div class="row"><button id="btnAddTss">Add TSS</button><button id="btnSortTss">Sort by chainage</button><span class="note">Blank no-load voltage or source resistance uses the values on the Electrical tab (resistance from the regulation %). Untick "in service" for a permanent outage.</span></div>
+      <div class="tw"><table class="et" id="tblTss"></table></div>
+    </div>
+
+    <div class="tabpane" id="t_train" role="tabpanel" hidden>
+      <div class="row">
+        <span class="lbl">Train type</span><select id="trainSel" aria-label="Train type"></select>
+        <button id="btnTrainAdd">Add train type</button><button id="btnTrainDup">Duplicate</button><button id="btnTrainDel">Delete</button>
+      </div>
+      <div class="drop" id="dropDocx">
+        <div><b>Upload train data (Word .docx)</b><div class="note">Reads parameter lines and tables, curve tables with a Speed column, Word charts (exact values) and graph pictures (digitised below). Fills the selected train type; check the report and edit anything below.</div></div>
+        <div class="row"><label class="btn" for="fileDocx">Choose Word file</label><input type="file" id="fileDocx" accept=".docx" hidden>
+          <label class="btn" for="fileImg">Digitise a graph image</label><input type="file" id="fileImg" accept="image/*" hidden></div>
+      </div>
+      <div id="docxReport" hidden></div>
+      <div class="fields" id="f_train"></div>
+      <div class="cols2" id="curveEditors"></div>
+    </div>
+
+    <div class="tabpane" id="t_align" role="tabpanel" hidden>
+      <div class="drop" id="dropXlsx">
+        <div><b>Upload alignment (Excel)</b><div class="note">Sheets for stations, gradients, curves, speed limits and rail levels are recognised by their headers. Chainage in m or km+m (12+345). Gradient units from the header: % or ‰; "1 in N" text also works.</div></div>
+        <div class="row"><label class="btn" for="fileXlsx">Choose Excel file</label><input type="file" id="fileXlsx" accept=".xlsx,.xlsm,.xls,.csv" hidden></div>
+      </div>
+      <div id="xlsxReport" hidden></div>
+      <div class="fields" id="f_align"></div>
+      <div class="cols2">
+        <div class="group"><h3>Stations <span class="row"><button class="sm" data-add="stations">Add</button></span></h3><div class="tw scroll"><table class="et" id="tblStations"></table></div></div>
+        <div class="group"><h3>Gradients <small>‰, + rising with chainage</small><span class="row"><button class="sm" data-add="gradients">Add</button></span></h3><div class="tw scroll"><table class="et" id="tblGrad"></table></div></div>
+        <div class="group"><h3>Curves <span class="row"><button class="sm" data-add="curves">Add</button></span></h3><div class="tw scroll"><table class="et" id="tblCurves"></table></div></div>
+        <div class="group"><h3>Speed limits <small>km/h</small><span class="row"><button class="sm" data-add="speed">Add</button></span></h3><div class="tw scroll"><table class="et" id="tblSpeed"></table></div></div>
+        <div class="group"><h3>Rail levels <small>optional, for the long section</small><span class="row"><button class="sm" data-add="elevations">Add</button></span></h3><div class="tw scroll"><table class="et" id="tblLevels"></table></div></div>
+      </div>
+    </div>
+
+    <div class="tabpane" id="t_elec" role="tabpanel" hidden>
+      <div class="cols2">
+        <div class="group"><h3>Supply and network</h3><div class="fields" id="f_elec"></div></div>
+        <div class="group"><h3>Train voltage behaviour</h3><div class="fields" id="f_trainV"></div></div>
+        <div class="group"><h3>Limits and ratings</h3><div class="fields" id="f_limits"></div></div>
+        <div class="group"><h3>Duty limits (× rating)</h3><div class="fields" id="f_duty"></div>
+          <p class="note">Normal service is checked against the normal multipliers; any case with a substation out uses the contingency set (e.g. IEC 60146 class VI: 150 % for 2 h, 300 % for 1 min).</p></div>
+      </div>
+    </div>
+
+    <div class="tabpane" id="t_sim" role="tabpanel" hidden>
+      <div class="group"><h3>Simulation settings</h3><div class="fields" id="f_sim"></div></div>
+      <div class="group"><h3>Extra outage cases for the design check</h3>
+        <p class="note">One case per line, substation names joined with + (for example <span class="mono">TSS3+TSS4</span>). Every single-TSS outage is always included.</p>
+        <textarea id="extraCases" aria-label="Extra outage cases"></textarea>
+      </div>
+    </div>
+
+    <div class="tabpane" id="t_studies" role="tabpanel" hidden>
+      <div class="cols2">
+        <div class="group"><h3>AC supply and rectifier transformer</h3><div class="fields" id="f_ac"></div>
+          <p class="note">Valve-side voltage blank = no-load DC voltage ÷ 1.35. With "derive source resistance" ticked, every TSS without its own resistance value uses 3·Xc/π + 2·Rc per bridge, from these data, instead of the regulation %.</p></div>
+        <div class="group"><h3>Short circuit</h3><div class="fields" id="f_sc"></div>
+          <p class="note">Fault step and fault resistance are on the Simulation tab; breaker trip setting and breaking capacity on the Electrical &amp; limits tab.</p></div>
+        <div class="group"><h3>Harmonics</h3><div class="fields" id="f_harm"></div>
+          <h3>Voltage harmonic limits at the supply point <span class="row"><button class="sm" data-addtbl="harm.limits">Add</button></span></h3>
+          <div class="tw scroll" style="max-height:220px"><table class="et" id="tblHarmLim"></table></div></div>
+        <div class="group"><h3>EMC / EMI</h3><div class="fields" id="f_emc"></div></div>
+        <div class="group"><h3>Touch voltage limits (rail potential) <span class="row"><button class="sm" data-addtbl="emc.touch_limits">Add</button></span></h3>
+          <p class="note">Default values follow the DC touch-voltage table of EN 50122-1; check them against the edition used on the project.</p>
+          <div class="tw scroll" style="max-height:240px"><table class="et" id="tblTouch"></table></div></div>
+        <div class="group"><h3>Psophometric weighting <span class="row"><button class="sm" data-addtbl="emc.psoph">Add</button></span></h3>
+          <p class="note">Weighting of the ripple frequencies for telecom noise (ITU-T O.41 curve; check values).</p>
+          <div class="tw scroll" style="max-height:220px"><table class="et" id="tblPsoph"></table></div>
+          <h3>DC ripple current limits <small>optional, e.g. track circuit susceptibility</small><span class="row"><button class="sm" data-addtbl="emc.ripple_limits">Add</button></span></h3>
+          <div class="tw scroll" style="max-height:160px"><table class="et" id="tblRipple"></table></div></div>
+      </div>
+    </div>
+
+    <div class="tabpane" id="t_more" role="tabpanel" hidden>
+      <p class="note">Keep any further project data here (drawing references, cable types, assumptions, client requirements). Rows are saved with the inputs and passed to the Python model, ready to be wired into the calculation later.</p>
+      <div class="row"><button id="btnAddExtra">Add row</button></div>
+      <div class="tw"><table class="et" id="tblExtra"></table></div>
+      <div class="group"><h3>Notes</h3><textarea id="projNotes" data-path="project.notes" aria-label="Project notes"></textarea></div>
+    </div>
+  </section>
+
+  <!-- ============ RESULTS ============ -->
+  <nav class="navrow" aria-label="Results sections">
+    <span class="lbl">Results</span>
+    <a href="#r_summary">Summary</a><a href="#r_plan">Line schematic</a><a href="#r_long">Long section</a><a href="#r_run">Train run</a>
+    <a href="#r_graph">Train graph</a><a href="#r_tss">TSS currents</a><a href="#r_volt">Train voltage</a><a href="#r_size">Equipment sizing</a>
+    <a href="#r_feed">Feeders &amp; rail</a><a href="#r_sc">Short circuit</a><a href="#r_harm">Harmonics</a><a href="#r_emc">EMC / EMI</a><a href="#r_checks">Checks</a><a href="#r_dc">Design check</a><a href="#r_reports">Reports</a><a href="#r_method">Method</a>
+  </nav>
+
+  <section class="panel" id="r_summary"><header><h2>Summary</h2><span class="ref" id="sumRef"></span></header>
+    <div class="body"><div class="cards" id="cards"></div><div id="warnBox"></div></div></section>
+
+  <section class="panel" id="r_plan"><header><h2>Line schematic</h2><span class="ref">Click a substation to take it out of service for this scenario</span></header>
+    <div class="body"><div class="drawing" id="planSvg"></div></div></section>
+
+  <section class="panel" id="r_long"><header><h2>Long section</h2><span class="ref">Levels, gradients (‰), curves and speed limits</span></header>
+    <div class="body"><div class="drawing" id="longSvg"></div></div></section>
+
+  <section class="panel" id="r_run"><header><h2>Train run</h2><span class="ref" id="runRef"></span></header>
+    <div class="body">
+      <div class="row"><span class="lbl">Run</span><select id="runSel" aria-label="Train run"></select></div>
+      <div class="chartbox"><canvas id="chSpeed" aria-label="Speed and power against distance"></canvas></div>
+      <div class="cols2"><div class="tw scroll"><table id="tblRun"></table></div><dl class="kv" id="runKv"></dl></div>
+    </div></section>
+
+  <section class="panel" id="r_graph"><header><h2>Train graph</h2><span class="ref">Time–distance for every train in the simulated period</span></header>
+    <div class="body"><div class="chartbox tall"><canvas id="chGraph" aria-label="Train graph"></canvas></div></div></section>
+
+  <section class="panel" id="r_tss"><header><h2>Substation currents</h2><span class="ref">Rectifier output current, second by second</span></header>
+    <div class="body"><div class="tsspick" id="tssPick"></div>
+      <div class="chartbox tall"><canvas id="chTss" aria-label="TSS currents"></canvas></div>
+      <div class="chartbox short"><canvas id="chBus" aria-label="TSS busbar voltage"></canvas></div></div></section>
+
+  <section class="panel" id="r_volt"><header><h2>Train voltage</h2><span class="ref">Lowest and highest pantograph / collector shoe voltage by position</span></header>
+    <div class="body"><div class="chartbox tall"><canvas id="chVolt" aria-label="Train voltage envelope"></canvas></div></div></section>
+
+  <section class="panel" id="r_size"><header><h2>Equipment sizing</h2><span class="ref" id="sizeRef"></span></header>
+    <div class="body"><div class="tw"><table id="tblSize"></table></div><p class="note" id="sizeNote"></p></div></section>
+
+  <section class="panel" id="r_feed"><header><h2>Feeders and conductor rail</h2></header>
+    <div class="body"><div class="cols2"><div class="tw scroll"><table id="tblFeed"></table></div><div class="tw scroll"><table id="tblCond"></table></div></div></div></section>
+
+  <section class="panel" id="r_sc"><header><h2>Short circuit</h2><span class="ref">DC faults along every track (no trains) and AC fault levels at each substation</span></header>
+    <div class="body">
+      <div class="cards" id="scCards"></div>
+      <div class="cols2">
+        <div><div class="lbl">Sustained fault current</div><div class="chartbox"><canvas id="chSc" aria-label="Fault current along the line"></canvas></div></div>
+        <div><div class="lbl">Initial rate of rise di/dt</div><div class="chartbox"><canvas id="chScDidt" aria-label="Rate of rise along the line"></canvas></div></div>
+      </div>
+      <div class="cols2">
+        <div><div class="lbl">Current rise at the nearest and the most remote fault</div><div class="chartbox"><canvas id="chScRise" aria-label="Fault current rise"></canvas></div></div>
+        <div><div class="lbl">Rail potential at the fault location</div><div class="chartbox"><canvas id="chScRail" aria-label="Rail potential during faults"></canvas></div></div>
+      </div>
+      <div class="tw"><table id="tblSc"></table></div>
+      <div class="tw"><table id="tblScAC"></table></div>
+    </div></section>
+
+  <section class="panel" id="r_harm"><header><h2>Harmonics</h2><span class="ref" id="harmRef"></span></header>
+    <div class="body">
+      <div class="cards" id="harmCards"></div>
+      <div class="row"><span class="lbl">Supply point</span><select id="harmSel" aria-label="Supply point"></select></div>
+      <div class="cols2">
+        <div><div class="lbl">Harmonic voltage spectrum against limits</div><div class="chartbox"><canvas id="chHarmSpec" aria-label="Harmonic spectrum"></canvas></div></div>
+        <div><div class="lbl">Voltage THD through the simulated period</div><div class="chartbox"><canvas id="chHarmThd" aria-label="Voltage THD against time"></canvas></div></div>
+      </div>
+      <div class="tw"><table id="tblHarm"></table></div>
+      <div class="cols2"><div class="tw scroll"><table id="tblHarmSpec"></table></div><div class="tw scroll"><table id="tblRipple2"></table></div></div>
+    </div></section>
+
+  <section class="panel" id="r_emc"><header><h2>EMC / EMI</h2><span class="ref">Rail potential, stray current, magnetic field and telecom interference</span></header>
+    <div class="body">
+      <div class="cards" id="emcCards"></div>
+      <div><div class="lbl">Rail potential along the line</div><div class="chartbox tall"><canvas id="chRail" aria-label="Rail potential envelope"></canvas></div></div>
+      <div class="cols2">
+        <div><div class="lbl" id="railNodeLbl">Rail potential at the worst location</div><div class="chartbox"><canvas id="chRailT" aria-label="Rail potential against time"></canvas></div></div>
+        <div><div class="lbl">Static magnetic field beside the track</div><div class="chartbox"><canvas id="chField" aria-label="Magnetic field against distance"></canvas></div></div>
+      </div>
+      <div class="cols2"><div class="tw"><table id="tblField"></table></div><div class="tw scroll"><table id="tblTelecom"></table></div></div>
+    </div></section>
+
+  <section class="panel" id="r_reports"><header><h2>Reports</h2><span class="ref">Each report uses the scenario now shown; the DC report adds the design check when it has been run</span></header>
+    <div class="body">
+      <div class="cols2" id="reportCards"></div>
+      <div class="row"><button class="primary" id="btnAllReports">Download all reports (.zip)</button><span class="note" id="reportNote"></span></div>
+    </div></section>
+
+  <section class="panel" id="r_checks"><header><h2>Result check</h2><span class="ref" id="chkRef"></span></header>
+    <div class="body"><div class="tw scroll" style="max-height:520px"><table id="tblChecks"></table></div></div></section>
+
+  <section class="panel" id="r_dc"><header><h2>Design check, all cases</h2><span class="ref">Normal service, each single substation out, and the extra cases</span></header>
+    <div class="body"><div class="row"><button class="accent" id="btnDesign2">Run design check</button><div class="progress" id="dcProg" hidden><i style="width:0"></i></div><span class="note" id="dcNote">Click a row to load that case.</span></div>
+      <div class="tw"><table id="tblDc"></table></div></div></section>
+
+  <section class="panel" id="r_method"><header><h2>Method and assumptions</h2></header>
+    <div class="body method">
+      <p><b>Train run.</b> Each service is integrated over a 5 m distance grid: a backward pass applies the service braking rate into every stop and speed restriction, a forward pass applies tractive effort limited to the set acceleration. Speed restrictions hold until the whole train length has cleared them. Resistance = Davis A + B·v + C·v² plus gradient (m·g·i) and curve resistance (Röckl: 650/(R−55) N/kN for R ≥ 300 m, 500/(R−30) below), averaged over the train length.</p>
+      <p><b>Power.</b> Motoring: wheel power ÷ drive efficiency (or the line-current curve × nominal voltage, scaled by effort used) + auxiliaries. Braking: electric brake effort up to the braking curve, × efficiency, capped at the regenerative power limit; friction brakes take the rest.</p>
+      <p><b>Network.</b> Every second the nodal equations are solved for substation busbars, feeder taps and train positions on each track (conductor + return rail loop resistance). Substations are Thévenin sources (no-load voltage, source resistance from regulation) with a diode: they cannot take current back. Optional inverters absorb surplus regeneration above their switch-on voltage.</p>
+      <p><b>Trains on the network.</b> Constant-power loads, iterated to convergence. Below the cut-back voltage, traction power reduces linearly to zero. Above the regeneration limit start, regenerated current reduces linearly to zero at the maximum voltage; the rest goes to the on-board rheostat.</p>
+      <p><b>Ratings.</b> Rectifier and transformer loads are compared as the worst rolling 1-minute, 15-minute and 1-hour RMS values against rating × duty multiplier. Transformer kVA = DC power ÷ (rectifier efficiency × power factor). Conductor and feeder thermal checks use the 1-hour RMS current.</p>
+      <p><b>Short circuit.</b> A bolted fault (set fault resistance) is placed every fault-step along each track with all substations feeding; the largest single-feeder contribution is compared with the breaker trip setting. Steady-state values: the rate of rise and peak need a transient study.</p>
+      <p><b>AC data.</b> Per bridge (pulse ÷ 6 bridges), commutation reactance Xc = transformer reactance (uk, load loss) + network reactance (fault level, X/R) referred to the valve side. AC fault currents use IEC 60909 with voltage factor c and κ = 1.02 + 0.98·e^(−3R/X).</p>
+      <p><b>Short circuit, rate of rise.</b> The same network is solved with inductances (conductor loop, feeder, rectifier 2·Lc per bridge plus any smoothing reactor) to give di/dt at t = 0; τ = Iss ÷ (di/dt), i(t) = Iss(1 − e^(−t/τ)); time to trip from the largest feeder contribution. Rail potential at the fault = If·Z(1 − e^(−γd)), Z = ½√(r/g), d = distance to the nearest TSS.</p>
+      <p><b>Harmonics.</b> For each second of TSS current: overlap 1 − cos μ = √2·Xc·Id/Uv; Ih/I1 from the overlap formula for uncontrolled bridges; characteristic orders kp ± 1, other 6k ± 1 orders at the residual %; Vh = Ih·h·Xnet. The percentile value is compared with the limits (IEC 61000-3-6 uses 95 %). A common bus adds TSS with the IEC 61000-3-6 summation exponents. DC ripple: ideal p-pulse values Vn = √2·Udi0/(n² − 1), current through the source and quarter-section inductance.</p>
+      <p><b>EMC.</b> Running rails of all tracks bonded, a ladder of rail resistance and rail–earth conductance every 100 m, train currents injected and TSS return currents drawn each second. Touch voltage taken as rail potential (no body or footwear resistance credit). Stray current = average current leaving the rails ÷ track length. Static field from the conductor rail and return currents (Biot–Savart); induced voltage = 2πf·M′·L·I with M′ from geometry, psophometric weighting and cable sensitivity.</p>
+      <p><b>Limits of this model.</b> Train movement is not slowed by low voltage (power is cut back but the timetable holds), turnback / depot movements are not included, fault currents are first-order (no rectifier overshoot or arc dynamics), harmonics assume an ideal supply without background distortion or resonance, and EMC values are planning estimates to be confirmed by site measurement. The same engine runs in the Python edition (tps_engine.py) and gives the same numbers for the same inputs.</p>
+    </div></section>
+</div>
+
+<div class="modal" id="digiModal" hidden role="dialog" aria-modal="true" aria-labelledby="digiTitle">
+  <div class="box">
+    <header><h2 id="digiTitle">Graph digitiser</h2><button id="digiClose">Close</button></header>
+    <div class="digi">
+      <div style="min-width:0"><canvas id="digiCanvas" width="900" height="560"></canvas>
+        <p class="note" id="digiHint">1 · Detect or click the plot frame corners. 2 · Enter the axis values at the frame edges. 3 · Click the curve to pick its colour, then Trace. You can also add or remove points by hand.</p></div>
+      <div style="display:flex;flex-direction:column;gap:12px;min-width:0">
+        <div class="seg" role="group" aria-label="Click mode">
+          <button id="dmFrame" aria-pressed="false">Frame</button><button id="dmColor" aria-pressed="true">Pick colour</button><button id="dmAdd" aria-pressed="false">Add point</button><button id="dmDel" aria-pressed="false">Delete point</button>
+        </div>
+        <div class="row"><button id="digiAuto">Detect frame</button><button class="accent" id="digiTrace">Trace curve</button><button id="digiClear">Clear points</button></div>
+        <div class="fields" style="grid-template-columns:1fr 1fr">
+          <div class="field"><label for="axX0">X at left edge</label><input type="number" id="axX0" value="0"></div>
+          <div class="field"><label for="axX1">X at right edge</label><input type="number" id="axX1" value="100"></div>
+          <div class="field"><label for="axY0">Y at bottom edge</label><input type="number" id="axY0" value="0"></div>
+          <div class="field"><label for="axY1">Y at top edge</label><input type="number" id="axY1" value="400"></div>
+          <div class="field"><label for="digiN">Points</label><input type="number" id="digiN" value="25" min="5" max="200"></div>
+          <div class="field"><label for="digiUse">Use as</label><select id="digiUse"><option value="te_curve">Tractive effort (kN)</option><option value="be_curve">Electric brake effort (kN)</option><option value="eff_curve">Efficiency (0–1 or %)</option><option value="line_current">Line current (A)</option></select></div>
+        </div>
+        <div class="row" style="font-size:12px"><span class="muted">Curve colour</span><span id="digiSw" style="display:inline-block;width:22px;height:14px;border:1px solid var(--rule)"></span><span class="mono" id="digiCol">auto</span></div>
+        <div class="tw scroll" style="max-height:220px"><table id="digiTbl"></table></div>
+        <button class="primary" id="digiApply">Apply to selected train</button>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" hidden></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script id="engine-js">
+/*__ENGINE__*/
+</script>
+<script id="readers-js">
+/*__READERS__*/
+</script>
+<div id="offscreen" aria-hidden="true" style="position:absolute;left:-10000px;top:0;width:1000px"></div>
+<script>
+/*__APP__*/
+</script>
+<script>
+/*__STUDIES__*/
+</script>

@@ -1,0 +1,1482 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{color-scheme:light dark}
+html,body{margin:0}
+img{max-width:100%}
+[hidden]{display:none!important}
+</style>
+<title>Onboard Telecom Layout Rev 16</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+:root{
+  --ground:#F1F0EC; --panel:#FBFAF8; --panel-2:#E9E7E1;
+  --ink:#15181A; --ink-2:#484F55; --ink-3:#7B848B;
+  --line:#D8D5CD; --line-strong:#BCB8AE;
+  --accent:#B0761C; --accent-soft:#F3E8D2;
+  --vp-bg:#EEEDE9;
+  --sig:#6B5BA8; --sig-soft:#E6E2F2;
+  --b58:#0B6E85; --b58-soft:#DCEDF1;
+  --lte:#A62B62; --lte-soft:#F6E0EA;
+  --ok:#2E7A58; --ok-soft:#DFEDE6;
+  --warn:#9A5A12; --warn-soft:#F6E8D4;
+  --tetra:#A5501F; --cctv:#D9532B; --pa:#C7900F; --pids:#17808F; --net:#3F68BC; --comp:#7E52BC; --radio:#26855A; --pwr:#B23C56; --rack:#66717B;
+  --f-disp:"Saira Condensed","Arial Narrow",Helvetica,sans-serif;
+  --f-body:"IBM Plex Sans",-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#0F1317; --panel:#161B20; --panel-2:#1D242A;
+    --ink:#EDEFF1; --ink-2:#AAB2B9; --ink-3:#768088;
+    --line:#262F37; --line-strong:#38434D;
+    --accent:#DFA53A; --accent-soft:#31270F;
+    --vp-bg:#0A0E12;
+    --sig:#A794E0; --sig-soft:#221D33;
+    --tetra:#DD8B4B;
+    --b58:#48BDD6; --b58-soft:#0E2A31;
+    --lte:#F07AAE; --lte-soft:#301120;
+    --ok:#57BC8C; --ok-soft:#12291F;
+    --warn:#DE9E45; --warn-soft:#2E2211;
+    --cctv:#F2724A; --pa:#E8B33F; --pids:#43BACD; --net:#7FA0E8; --comp:#B48EE8; --radio:#57C68B; --pwr:#E4788F; --rack:#96A1AB;
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#0F1317; --panel:#161B20; --panel-2:#1D242A;
+  --ink:#EDEFF1; --ink-2:#AAB2B9; --ink-3:#768088;
+  --line:#262F37; --line-strong:#38434D;
+  --accent:#DFA53A; --accent-soft:#31270F;
+  --vp-bg:#0A0E12;
+  --sig:#A794E0; --sig-soft:#221D33;
+  --tetra:#DD8B4B;
+  --b58:#48BDD6; --b58-soft:#0E2A31;
+  --lte:#F07AAE; --lte-soft:#301120;
+  --ok:#57BC8C; --ok-soft:#12291F;
+  --warn:#DE9E45; --warn-soft:#2E2211;
+  --cctv:#F2724A; --pa:#E8B33F; --pids:#43BACD; --net:#7FA0E8; --comp:#B48EE8; --radio:#57C68B; --pwr:#E4788F; --rack:#96A1AB;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1400px;margin:0 auto;padding:18px 18px 56px}
+
+.mast{display:flex;flex-wrap:wrap;gap:14px 24px;align-items:flex-end;justify-content:space-between;padding-bottom:12px;border-bottom:2px solid var(--ink)}
+.mast h1{font-family:var(--f-disp);font-weight:700;font-size:clamp(26px,4vw,44px);line-height:.95;margin:0}
+.mast h1 span{display:block;font-size:.42em;font-weight:600;color:var(--ink-3);letter-spacing:.12em;text-transform:uppercase;margin-bottom:5px}
+.stamp{display:flex;flex-wrap:wrap;border:1px solid var(--line-strong);font-family:var(--f-mono);font-size:11px}
+.stamp div{padding:5px 11px;border-right:1px solid var(--line-strong)}
+.stamp div:last-child{border-right:0}
+.stamp b{display:block;font-size:9px;letter-spacing:.13em;color:var(--ink-3);font-weight:500;text-transform:uppercase}
+.stamp .rev{background:var(--accent);color:#111}
+.stamp .rev b{color:#111;opacity:.7}
+
+.nav{display:flex;flex-wrap:wrap;gap:14px;align-items:center;justify-content:space-between;margin-top:14px;padding:8px 0;border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:0;flex-wrap:wrap}
+.tab{background:transparent;border:0;border-bottom:2px solid transparent;padding:6px 15px 8px;font-family:var(--f-disp);font-size:18px;font-weight:600;color:var(--ink-3);cursor:pointer}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.navr{display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+button{font-family:inherit}
+.themebtn{background:transparent;border:1px solid var(--line-strong);color:var(--ink-2);padding:5px 12px;font-family:var(--f-mono);font-size:11px;cursor:pointer;display:flex;gap:7px;align-items:center}
+.themebtn:hover{border-color:var(--ink-2);color:var(--ink)}
+.tab:focus-visible,button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+.toolbar{display:flex;flex-wrap:wrap;gap:8px 22px;align-items:center;margin:12px 0;padding:9px 0;border-bottom:1px solid var(--line)}
+.tgroup{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.tlabel{font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3)}
+.vbtn{background:transparent;border:1px solid var(--line-strong);color:var(--ink-2);padding:5px 11px;font-family:var(--f-mono);font-size:11px;cursor:pointer}
+.vbtn:hover{border-color:var(--ink-2);color:var(--ink)}
+.vbtn[aria-pressed="true"]{background:var(--ink);color:var(--ground);border-color:var(--ink)}
+input[type=range]{accent-color:var(--accent);width:180px}
+
+.t2w{padding:11px 13px;border-bottom:1px solid var(--line);background:var(--panel-2)}
+.t2w .hd{display:flex;gap:8px;align-items:center;justify-content:space-between;margin-bottom:5px}
+.t2w .ttl{font-family:var(--f-mono);font-size:10px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-2);line-height:1.35}
+.t2w .tagp{font-family:var(--f-mono);font-size:8.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent);padding:2px 6px;flex:none}
+.t2w .opt{display:flex;align-items:center;gap:7px;font-family:var(--f-mono);font-size:11px;color:var(--ink-2);padding:2px 0}
+.t2w .opt .ring{width:9px;height:9px;flex:none;border-radius:50%;border:1px solid var(--line-strong)}
+.t2w .nt{font-size:10.5px;color:var(--ink-3);margin-top:5px;line-height:1.4}
+.nsglg{padding:7px 13px 10px;border-top:1px solid var(--line);background:var(--panel-2)}
+.nsglg .r{display:flex;align-items:center;gap:9px;padding:3px 0;font-size:11.5px;color:var(--ink-2)}
+.nsglg .sq{width:10px;height:10px;flex:none;border-radius:2px}
+.nsglg .sq.s58{background:var(--b58)} .nsglg .sq.slte{background:var(--lte)} .nsglg .sq.sob{background:var(--radio)} .nsglg .sq.stet{background:var(--tetra)}
+.nsglg .sq.cf1{background:var(--cctv)} .nsglg .sq.cf2{background:var(--pa)} .nsglg .sq.cf3{background:var(--pids)}
+.nsglg .hdd{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3);margin-bottom:4px}
+.t2w .ring.r58[data-on="1"]{background:var(--b58);border-color:var(--b58)}
+.t2w .ring.rlte[data-on="1"]{background:var(--lte);border-color:var(--lte)}
+.t2w .ring.rtet[data-on="1"]{background:var(--tetra);border-color:var(--tetra)}
+.vbtn.b58btn[aria-pressed="true"]{background:var(--b58);border-color:var(--b58);color:#fff}
+.vbtn.ltebtn[aria-pressed="true"]{background:var(--lte);border-color:var(--lte);color:#fff}
+.vbtn.tetbtn[aria-pressed="true"]{background:var(--tetra);border-color:var(--tetra);color:#fff}
+.vbtn.covbtn[aria-pressed="true"]{background:var(--b58);border-color:var(--b58);color:#fff}
+.vbtn.camcovbtn[aria-pressed="true"]{background:var(--cctv);border-color:var(--cctv);color:#fff}
+.hud2{position:absolute;left:12px;top:10px;font-family:var(--f-mono);font-size:11px;line-height:1.55;color:var(--ink-2);pointer-events:none;background:color-mix(in srgb, var(--panel) 82%, transparent);border-left:2px solid var(--b58);padding:6px 10px;max-width:70%}
+.hud2 b{font-weight:500}
+.hud2 .c{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:5px;transform:translateY(1px)}
+.stage{display:grid;grid-template-columns:236px 1fr;gap:1px;background:var(--line);border:1px solid var(--line)}
+@media(max-width:940px){.stage{grid-template-columns:1fr}}
+.col{background:var(--panel);min-width:0}
+.colhead{padding:9px 13px;border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-3);display:flex;justify-content:space-between}
+.lay{display:flex;align-items:center;gap:9px;width:100%;text-align:left;background:transparent;border:0;padding:6px 13px;color:var(--ink-2);cursor:pointer}
+.lay:hover{background:var(--panel-2)}
+.lay[aria-pressed="false"]{opacity:.38}
+.swatch{width:10px;height:10px;flex:none;border-radius:2px;background:var(--c)}
+.lay .nm{flex:1;font-size:12px;color:var(--ink)}
+.lay .ct{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+.itemlist{border-top:1px solid var(--line);padding:4px 0 8px;max-height:300px;overflow-y:auto}
+.row{display:grid;grid-template-columns:10px 1fr auto;gap:8px;align-items:baseline;width:100%;text-align:left;background:transparent;border:0;border-left:3px solid transparent;padding:5px 13px;color:var(--ink-2);cursor:pointer}
+.row:hover{background:var(--panel-2)}
+.row.sel{border-left-color:var(--c);background:var(--panel-2)}
+.row .dot{width:8px;height:8px;border-radius:50%;background:var(--c);transform:translateY(1px)}
+.row .nm{font-size:12px;color:var(--ink);line-height:1.3}
+.row .q{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);font-variant-numeric:tabular-nums}
+
+.view{position:relative;background:var(--vp-bg);min-height:470px;overflow:hidden}
+#cv{display:block;width:100%;height:100%}
+.hud{position:absolute;left:12px;bottom:10px;font-family:var(--f-mono);font-size:10px;color:var(--ink-3);pointer-events:none}
+.carlabel{position:absolute;pointer-events:none;font-family:var(--f-mono);font-size:10px;letter-spacing:.12em;color:var(--ink-3);transform:translate(-50%,-50%)}
+.tip{position:absolute;pointer-events:none;transform:translate(-50%,calc(-100% - 14px));background:var(--ink);color:var(--ground);padding:5px 9px;font-family:var(--f-mono);font-size:11px;white-space:nowrap;opacity:0;transition:opacity .12s}
+.tip.on{opacity:1}
+.tip i{display:block;font-style:normal;opacity:.6;font-size:10px}
+.strip{display:grid;grid-template-columns:1fr auto;gap:16px;align-items:center;border:1px solid var(--line);border-top:0;background:var(--panel);padding:10px 14px;min-height:58px}
+.strip .l{display:flex;gap:12px;align-items:center;min-width:0}
+.strip h4{margin:0;font-family:var(--f-disp);font-size:18px;font-weight:600;line-height:1.1}
+.strip .m{font-family:var(--f-mono);font-size:11px;color:var(--ink-3)}
+.qs{display:flex;gap:1px;background:var(--line);border:1px solid var(--line);flex:none}
+.qs div{background:var(--panel);padding:4px 10px;text-align:center;min-width:54px}
+.qs b{display:block;font-family:var(--f-mono);font-size:14px;font-variant-numeric:tabular-nums}
+.qs span{font-family:var(--f-mono);font-size:8.5px;letter-spacing:.1em;color:var(--ink-3)}
+
+/* signalling tab */
+section{margin-top:26px}
+h2{font-family:var(--f-disp);font-weight:700;font-size:22px;margin:0 0 3px;display:flex;gap:11px;align-items:baseline;flex-wrap:wrap}
+h2 em{font-family:var(--f-mono);font-style:normal;font-size:10.5px;color:var(--ink-3);letter-spacing:.12em}
+.sub{color:var(--ink-2);margin:0 0 12px;max-width:80ch;font-size:13px}
+.scopebar{display:flex;gap:12px;align-items:flex-start;border:1px solid var(--sig);border-left:3px solid var(--sig);background:var(--sig-soft);padding:11px 14px;margin:14px 0 16px}
+.scopebar .tagx{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.13em;text-transform:uppercase;color:var(--sig);border:1px solid var(--sig);padding:3px 8px;flex:none;white-space:nowrap}
+.scopebar p{margin:0;font-size:12.5px;color:var(--ink-2)}
+.scopebar b{color:var(--ink)}
+.diagwrap{border:1px solid var(--line);background:var(--panel);padding:12px;overflow-x:auto}
+.diagwrap svg{display:block;min-width:1000px;width:100%;height:auto}
+.scopebar.ours{border-color:var(--ok);background:var(--ok-soft)}
+.scopebar.ours .tagx{color:var(--ok);border-color:var(--ok)}
+.scopebar.warn2{border-color:var(--warn);background:var(--warn-soft)}
+.scopebar.warn2 .tagx{color:var(--warn);border-color:var(--warn)}
+.vbtn.chbtn[aria-pressed="true"],.vbtn.cnbtn[aria-pressed="true"]{background:var(--b58);border-color:var(--b58);color:#fff}
+.vbtn.failbtn[aria-pressed="true"]{background:var(--pwr);border-color:var(--pwr);color:#fff}
+.statrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);border-top:0}
+.statrow .st{background:var(--panel);padding:9px 13px}
+.statrow .st .k{font-family:var(--f-mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}
+.statrow .st .v{font-family:var(--f-mono);font-size:13px;margin-top:3px;color:var(--ink);font-variant-numeric:tabular-nums}
+.statrow .st .v small{font-size:10px;color:var(--ink-3);letter-spacing:.04em}
+.statrow .st.warn .v{color:var(--pwr)}
+.statrow .st.good .v{color:var(--ok)}
+.statrow .st.roam .v{color:var(--accent)}
+.cards4{display:grid;grid-template-columns:repeat(auto-fit,minmax(255px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:14px}
+.cards2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:14px}
+.ca.ok .kick{color:var(--ok)} .ca.b58 .kick{color:var(--b58)} .ca.lte .kick{color:var(--lte)}
+.cap{font-family:var(--f-mono);font-size:10px;color:var(--ink-3);margin:7px 0 0}
+.bsel{display:flex;gap:7px;align-items:center;flex-wrap:wrap;margin:10px 0}
+.bnote{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3)}
+table.cmp td:first-child{background:var(--panel-2);white-space:normal}
+td.c58{background:var(--b58-soft)} td.clte{background:var(--lte-soft)}
+tr.tot td{background:var(--panel-2);border-top:1px solid var(--line-strong)}
+.cards3{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-top:16px}
+.ca{background:var(--panel);padding:14px}
+.ca .kick{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--sig)}
+.ca h3{margin:3px 0 8px;font-family:var(--f-disp);font-size:19px;font-weight:600;line-height:1.1}
+.ca p{margin:0 0 8px;font-size:12.5px;color:var(--ink-2)}
+.ca p:last-child{margin-bottom:0}
+.ca b{color:var(--ink)}
+.tablewrap{overflow-x:auto;border:1px solid var(--line);margin-top:6px}
+table{border-collapse:collapse;width:100%;min-width:560px;font-size:12px;background:var(--panel)}
+th,td{text-align:left;padding:7px 11px;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.11em;text-transform:uppercase;color:var(--ink-3);font-weight:500;background:var(--panel-2);border-bottom:1px solid var(--line-strong)}
+td.num,th.num{text-align:right;font-family:var(--f-mono);font-variant-numeric:tabular-nums;white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.sg{background:var(--sig-soft)}
+td.nsg{background:var(--ok-soft)}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:9.5px;letter-spacing:.05em;padding:2px 7px;border:1px solid;white-space:nowrap}
+.p-sig{background:var(--sig-soft);color:var(--sig);border-color:var(--sig)}
+.p-ours{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.srcnote{font-family:var(--f-mono);font-size:10.5px;color:var(--ink-3);margin-top:10px}
+
+footer{margin-top:34px;padding-top:12px;border-top:1px solid var(--line);font-family:var(--f-mono);font-size:10px;color:var(--ink-3);display:flex;flex-wrap:wrap;gap:6px 22px;justify-content:space-between}
+footer b{color:var(--ink)}
+[hidden]{display:none!important}
+@media (prefers-reduced-motion: reduce){*{transition:none!important}}
+</style>
+
+<div class="wrap">
+
+<header class="mast">
+  <h1><span>Dubai Al Maktoum International Airport APM</span>Onboard Telecom Equipment Layout</h1>
+  <div class="stamp">
+    <div class="rev"><b>Revision</b>16</div>
+    <div><b>Consist</b>3-car</div>
+    <div><b>Issue</b>Presentation copy</div>
+  </div>
+</header>
+
+<div class="nav">
+  <div class="tabs" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" data-tab="arch">Vehicle architecture</button>
+  </div>
+  <div class="navr">
+    <button class="themebtn" id="themebtn"><span id="themeicon">◐</span><span id="themetext">Theme</span></button>
+  </div>
+</div>
+
+<!-- ================= TAB 1 ================= -->
+<div id="page-arch">
+  <div class="toolbar">
+    <div class="tgroup">
+      <span class="tlabel">View</span>
+      <button class="vbtn" data-view="ext" aria-pressed="true">Exterior</button>
+      <button class="vbtn" data-view="xray" aria-pressed="false">Cutaway</button>
+      <button class="vbtn" data-view="inside" aria-pressed="false">Walk inside</button>
+      <button class="vbtn" data-view="roof" aria-pressed="false">Roof</button>
+      <button class="vbtn" data-view="wayside" aria-pressed="false">Wayside coverage</button>
+    </div>
+    <div class="tgroup" id="walkwrap" hidden>
+      <span class="tlabel">Position</span>
+      <input type="range" id="walk" min="0" max="1000" value="500">
+      <button class="vbtn" id="turn">Turn around</button>
+    </div>
+    <div class="tgroup">
+      <span class="tlabel">Motion</span>
+      <button class="vbtn" id="runbtn" aria-pressed="true">Train running</button>
+      <input type="range" id="spd" min="1" max="20" value="8" style="width:110px" title="Apparent speed">
+    </div>
+    <div class="tgroup">
+      <span class="tlabel">Bearer</span>
+      <button class="vbtn b58btn" data-bearer="b58" aria-pressed="true">5.8 GHz</button>
+      <button class="vbtn ltebtn" data-bearer="lte" aria-pressed="false">Private LTE</button>
+      <button class="vbtn tetbtn" data-bearer="tet" aria-pressed="false">TETRA</button>
+      <button class="vbtn covbtn" id="cov3d" aria-pressed="true">Coverage</button>
+      <span class="bnote" id="bnote"></span>
+    </div>
+    <div class="tgroup">
+      <span class="tlabel">Overlay</span>
+      <button class="vbtn" id="flowbtn" aria-pressed="false">Signal flow</button>
+      <button class="vbtn camcovbtn" id="camcov" aria-pressed="true">CCTV coverage</button>
+    </div>
+  </div>
+
+  <div class="stage">
+    <div class="col">
+      <div class="t2w">
+        <div class="hd"><span class="ttl">Train-to-wayside<br>communication</span><span class="tagp">Our scope</span></div>
+        <div class="opt"><span class="ring r58" id="ring58"></span>Broadband 5.8 GHz</div>
+        <div class="opt"><span class="ring rlte" id="ringlte"></span>Private LTE</div>
+        <div class="opt"><span class="ring rtet" id="ringtet"></span>TETRA, voice only</div>
+        <div class="nt">Use the Bearer buttons above the model to show each option on the guideway, on its own or together.</div>
+      </div>
+      <div class="colhead"><span>Subsystems</span><span id="totall"></span></div>
+      <div id="layers"></div>
+      <div class="nsglg" id="nsglg">
+        <div class="hdd">Non-signalling bearer · our scope</div>
+        <div class="r" id="lg58"><span class="sq s58"></span>5.8 GHz wayside pole, directional antenna</div>
+        <div class="r" id="lgch"><span class="sq cf1"></span><span class="sq cf2"></span><span class="sq cf3"></span>Overlapping cells, channels F1 F2 F3</div>
+        <div class="r" id="lglte" hidden><span class="sq slte"></span>Private LTE eNodeB site</div>
+        <div class="r" id="lgtet" hidden><span class="sq stet"></span>TETRA base station, voice only</div>
+        <div class="r"><span class="sq sob"></span>Onboard data radio and roof antenna</div>
+      </div>
+      <div class="colhead" style="border-top:1px solid var(--line)">Equipment</div>
+      <div class="itemlist" id="items"></div>
+    </div>
+    <div class="col view" id="view">
+      <canvas id="cv"></canvas>
+      <div class="hud" id="hud"></div>
+      <div class="hud2" id="hud2" hidden></div>
+      <div class="tip" id="tip"></div>
+    </div>
+  </div>
+  <div class="strip" id="strip"></div>
+</div>
+
+
+<footer>
+  <span>SJ + RINA JV · Detail Design of APM System and Depot Building</span>
+  <span>view only · internal</span>
+</footer>
+</div>
+
+<script>
+/* ================= data ================= */
+var SUBS = {
+  cctv: {name:"Video surveillance", c:"var(--cctv)", hex:0xD9532B, hexD:0xF2724A},
+  pa:   {name:"Public address", c:"var(--pa)", hex:0xC7900F, hexD:0xE8B33F},
+  pids: {name:"Passenger information", c:"var(--pids)", hex:0x17808F, hexD:0x43BACD},
+  net:  {name:"Data network", c:"var(--net)", hex:0x3F68BC, hexD:0x7FA0E8},
+  comp: {name:"Onboard computer", c:"var(--comp)", hex:0x7E52BC, hexD:0xB48EE8},
+  radio:{name:"Radio & antennas", c:"var(--radio)", hex:0x26855A, hexD:0x57C68B},
+  tetra:{name:"TETRA voice radio", c:"var(--tetra)", hex:0xA5501F, hexD:0xDD8B4B},
+  pwr:  {name:"Telecom power", c:"var(--pwr)", hex:0xB23C56, hexD:0xE4788F}
+};
+var CARX = [-12.6, 0, 12.6], CARN = ["A","B","C"];
+var YB = 1.05, L = 12, W = 2.9, H = 2.62;
+function P(c,x,y,z){ return [CARX[c]+x, YB+y, z]; }
+function all(fn){ var o=[]; for(var i=0;i<3;i++) o=o.concat(fn(i)); return o; }
+/* the saloon ceiling stops short of the raked nose, so anything on it must too */
+function CEIL(c){
+  var n = c===0?-1:(c===2?1:0);
+  var x0 = n===-1 ? -3.30 : -5.80, x1 = n===1 ? 3.30 : 5.80;
+  return {x0:x0, x1:x1, len:(x1-x0), mid:(x0+x1)/2};
+}
+var DOOR_X = [-2.5, 2.5], SPK_Y = 2.00, SPK_Z = 1.30;
+
+var EQ = [
+{id:"cam", sub:"cctv", shape:"dome", name:"Saloon CCTV camera",
+ model:"1080p rail dome, H.265", mount:"Ceiling, two per car facing opposite ends",
+ qty:[2,2,2], pos:all(function(c){var b=CEIL(c);return [P(c,b.x0+0.75,2.30,0),P(c,b.x1-0.75,2.30,0)];})},
+{id:"nvr", sub:"comp", shape:"box", name:"Onboard recorder / archiver",
+ model:"Rugged rail computer, 30-day archive", mount:"Under-seat enclosure, end cars",
+ qty:[1,0,1], pos:[P(0,4.30,0.30,1.05),P(2,-4.30,0.30,1.05)]},
+{id:"spk", sub:"pa", shape:"disc", name:"Saloon loudspeaker",
+ model:"Ceiling loudspeaker, 8 ohm", mount:"Ceiling centreline, three per car",
+ qty:[3,3,3], pos:all(function(c){return [P(c,-3.6,2.30,0),P(c,0,2.30,0),P(c,3.6,2.30,0)];})},
+{id:"amp", sub:"pa", shape:"box", name:"PA amplifier",
+ model:"Two channel rail amplifier", mount:"Wall panel, one per car",
+ qty:[1,1,1], pos:[P(0,-0.9,0.92,1.32),P(1,-0.9,0.92,1.32),P(2,-0.9,0.92,1.32)]},
+{id:"pep", sub:"pa", shape:"panel", name:"Passenger intercom panel",
+ model:"Full duplex intercom, press to call", mount:"Side wall panel, two per car",
+ qty:[2,2,2], pos:all(function(c){return [P(c,-1.15,1.34,1.40),P(c,1.15,1.34,1.40)];})},
+{id:"noise", sub:"pa", shape:"disc", name:"Ambient noise sensor",
+ model:"Rail noise monitor for automatic volume control", mount:"Ceiling, mid saloon",
+ qty:[1,1,1], pos:all(function(c){return [P(c,1.8,2.34,0.70)];})},
+{id:"band", sub:"pids", shape:"band", name:"Surround display band",
+ model:"Tiled LED band running the full perimeter", mount:"Ceiling perimeter, one controller per car",
+ qty:[1,1,1],
+ pos:all(function(c){var b=CEIL(c);return [P(c,b.mid,2.12,1.31),P(c,b.mid,2.12,-1.31),P(c,b.x0,2.12,0),P(c,b.x1,2.12,0)];}),
+ sizes:all(function(c){var b=CEIL(c);return [[b.len,0.34,0.07],[b.len,0.34,0.07],[0.07,0.34,2.62],[0.07,0.34,2.62]];})},
+{id:"dctl", sub:"pids", shape:"box", name:"Display controller",
+ model:"LED sending controller", mount:"Wall panel, one per car",
+ qty:[1,1,1], pos:[P(0,-0.9,0.92,-1.32),P(1,-0.9,0.92,-1.32),P(2,-0.9,0.92,-1.32)]},
+{id:"adv", sub:"pids", shape:"panel", name:"Advertising display",
+ model:"Flat screen, bulkhead mounted", mount:"Car end bulkheads",
+ qty:[2,2,2], pos:all(function(c){return [P(c,-5.3,1.72,0.62),P(c,5.3,1.72,-0.62)];})},
+{id:"sw", sub:"net", shape:"box", name:"Onboard Ethernet switch",
+ model:"Rail managed switch with PoE", mount:"Under-seat enclosure, one per car",
+ qty:[1,1,1], pos:[P(0,0.9,0.30,1.05),P(1,0.9,0.30,1.05),P(2,0.9,0.30,1.05)]},
+{id:"wcl", sub:"radio", shape:"box", name:"Vehicle data transmission unit",
+ model:"Train to wayside data radio, non-signalling", mount:"Under-seat enclosure, end cars",
+ qty:[1,0,1], pos:[P(0,3.5,0.30,1.05),P(2,-3.5,0.30,1.05)]},
+{id:"ant", sub:"radio", shape:"wedge", name:"Roof antenna",
+ model:"Telecom roof antennas, non-signalling", mount:"Roof, end cars",
+ qty:[4,0,4], pos:[
+   P(0,-4.3,2.70,0.62),P(0,-4.3,2.70,-0.62),P(0,-2.7,2.72,0.62),P(0,-2.7,2.72,-0.62),
+   P(2,4.3,2.70,0.62),P(2,4.3,2.70,-0.62),P(2,2.7,2.72,0.62),P(2,2.7,2.72,-0.62)]},
+{id:"tet", sub:"tetra", shape:"console", name:"TETRA cab radio",
+ model:"Digital trunked radio, voice only, 380 to 400 MHz", mount:"Front equipment compartment with the stowed driving console, end cars",
+ qty:[1,0,1], pos:[P(0,-5.02,0.52,0),P(2,5.02,0.52,0)]},
+{id:"tant", sub:"tetra", shape:"wedge", name:"TETRA roof antenna",
+ model:"Quarter wave whip, UHF", mount:"Roof, leading and trailing cars",
+ qty:[1,0,1], pos:[P(0,-1.4,2.70,0),P(2,1.4,2.70,0)]}
+];
+
+/* ================= theme ================= */
+function currentDark(){
+  var t=document.documentElement.getAttribute("data-theme");
+  if(t==="dark") return true;
+  if(t==="light") return false;
+  return window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+}
+document.getElementById("themebtn").addEventListener("click", function(){
+  document.documentElement.setAttribute("data-theme", currentDark()?"light":"dark");
+  syncTheme();
+});
+function syncTheme(){
+  var d=currentDark();
+  document.getElementById("themeicon").textContent = d?"☾":"☀";
+  document.getElementById("themetext").textContent = d?"Dark":"Light";
+  if(window.applySceneTheme) window.applySceneTheme(d);
+}
+
+/* ================= tabs ================= */
+var tabs=document.querySelectorAll(".tab");
+function showTab(t){
+  for(var j=0;j<tabs.length;j++) tabs[j].setAttribute("aria-selected", String(tabs[j].dataset.tab===t));
+  document.getElementById("page-arch").hidden=(t!=="arch");
+  if(t==="arch"){ resize(); place(); }
+}
+for(var ti=0;ti<tabs.length;ti++) tabs[ti].addEventListener("click", function(e){ showTab(e.currentTarget.dataset.tab); });
+
+/* ================= bearer selection ================= */
+var BEAR={b58:true, lte:false, tet:false};
+function syncBearer(){
+  var bb=document.querySelectorAll("[data-bearer]");
+  for(var i=0;i<bb.length;i++) bb[i].setAttribute("aria-pressed", String(!!BEAR[bb[i].dataset.bearer]));
+  document.getElementById("ring58").setAttribute("data-on", BEAR.b58?"1":"0");
+  document.getElementById("ringlte").setAttribute("data-on", BEAR.lte?"1":"0");
+  document.getElementById("ringtet").setAttribute("data-on", BEAR.tet?"1":"0");
+  document.getElementById("lg58").hidden = !BEAR.b58;
+  document.getElementById("lglte").hidden = !BEAR.lte;
+  document.getElementById("lgtet").hidden = !BEAR.tet;
+  document.getElementById("nsglg").hidden = !(BEAR.b58||BEAR.lte||BEAR.tet);
+  var on=[]; if(BEAR.b58) on.push("5.8 GHz"); if(BEAR.lte) on.push("private LTE"); if(BEAR.tet) on.push("TETRA");
+  var n = on.length===0 ? "none shown, onboard and backbone only"
+        : on.length===1 ? (BEAR.b58 ? "broadband 5.8 GHz" : BEAR.lte ? "private LTE" : "voice bearer only")
+        : on.join(" and ")+" shown together";
+  document.getElementById("bnote").textContent = n;
+  if(window.setBearer3D) window.setBearer3D(BEAR);
+}
+document.addEventListener("click", function(e){
+  var b=e.target.closest ? e.target.closest("[data-bearer]") : null;
+  if(!b) return;
+  BEAR[b.dataset.bearer] = !BEAR[b.dataset.bearer];
+  syncBearer();
+});
+
+
+/* ================= 3D ================= */
+var cv=document.getElementById("cv"), viewEl=document.getElementById("view"), tip=document.getElementById("tip");
+var renderer=new THREE.WebGLRenderer({canvas:cv, antialias:true});
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
+var scene=new THREE.Scene();
+var camera=new THREE.PerspectiveCamera(45,1,0.05,400);
+var hemi=new THREE.HemisphereLight(0xffffff,0x444444,0.9); scene.add(hemi);
+var key=new THREE.DirectionalLight(0xfff4e2,1.0); key.position.set(16,26,18); scene.add(key);
+var fillL=new THREE.DirectionalLight(0xbcd4ee,0.45); fillL.position.set(-20,10,-14); scene.add(fillL);
+var rim=new THREE.DirectionalLight(0xffe0b0,0.35); rim.position.set(-8,5,22); scene.add(rim);
+var inLight=new THREE.PointLight(0xfff0d8,0.0,40); inLight.position.set(0,YB+2.1,0); scene.add(inLight);
+
+var guideMat=new THREE.MeshStandardMaterial({roughness:.95});
+var railMat=new THREE.MeshStandardMaterial({roughness:.8});
+var tieMat=new THREE.MeshStandardMaterial({roughness:.9});
+/* the train stays put, the scenery runs past it */
+var PITCH=6, SPAN=156;
+var scenery=new THREE.Group(); scene.add(scenery);
+var gwy=new THREE.Mesh(new THREE.BoxGeometry(360,0.5,5.4), guideMat); gwy.position.set(0,-0.28,0); scenery.add(gwy);
+[-2.4,2.4].forEach(function(z){ var g=new THREE.Mesh(new THREE.BoxGeometry(360,0.34,0.4), railMat); g.position.set(0,0.14,z); scenery.add(g); });
+var grid=new THREE.GridHelper(336,112); grid.position.y=-0.53; scenery.add(grid);
+var tieGeo=new THREE.BoxGeometry(0.42,0.10,5.0);
+for(var tX=-SPAN; tX<=SPAN; tX+=PITCH/2){
+  var tie=new THREE.Mesh(tieGeo, tieMat); tie.position.set(tX,0.02,0); scenery.add(tie);
+}
+
+/* the nose outline of the body profile, sampled so the front end can be rebuilt from it */
+function noseOutline(nose){
+  var x0=-L/2, x1=L/2, pts=[], i;
+  var a,b,c1,c2;
+  if(nose===-1){
+    a=new THREE.Vector2(x0,0.55); c1=new THREE.Vector2(x0+0.25,1.5); b=new THREE.Vector2(x0+1.85,H-0.30);
+    c2=new THREE.Vector2(x0+2.15,H); var e=new THREE.Vector2(x0+2.55,H);
+    pts.push(new THREE.Vector2(x0,0));
+    var q1=new THREE.QuadraticBezierCurve(a,c1,b).getPoints(14);
+    var q2=new THREE.QuadraticBezierCurve(b,c2,e).getPoints(8);
+    pts=pts.concat(q1).concat(q2.slice(1));
+  } else {
+    a=new THREE.Vector2(x1,0.55); c1=new THREE.Vector2(x1-0.25,1.5); b=new THREE.Vector2(x1-1.85,H-0.30);
+    c2=new THREE.Vector2(x1-2.15,H); var e2=new THREE.Vector2(x1-2.55,H);
+    pts.push(new THREE.Vector2(x1,0));
+    var r1=new THREE.QuadraticBezierCurve(a,c1,b).getPoints(14);
+    var r2=new THREE.QuadraticBezierCurve(b,c2,e2).getPoints(8);
+    pts=pts.concat(r1).concat(r2.slice(1));
+  }
+  return pts;
+}
+/* a rounded-corner panel, used for every window and door light */
+function roundPanel(w,h,r){
+  var sh=new THREE.Shape(), x=w/2, y=h/2;
+  r=Math.min(r,Math.min(x,y)*0.9);
+  sh.moveTo(-x+r,-y); sh.lineTo(x-r,-y); sh.quadraticCurveTo(x,-y,x,-y+r);
+  sh.lineTo(x,y-r); sh.quadraticCurveTo(x,y,x-r,y);
+  sh.lineTo(-x+r,y); sh.quadraticCurveTo(-x,y,-x,y-r);
+  sh.lineTo(-x,-y+r); sh.quadraticCurveTo(-x,-y,-x+r,-y);
+  var gg=new THREE.ExtrudeGeometry(sh,{depth:0.03,bevelEnabled:false,curveSegments:6});
+  gg.translate(0,0,-0.015); return gg;
+}
+function bodyShape(nose){
+  var s=new THREE.Shape(), x0=-L/2, x1=L/2, r=0.42;
+  if(nose===1){
+    s.moveTo(x0,0); s.lineTo(x1,0); s.lineTo(x1,0.55);
+    s.quadraticCurveTo(x1-0.25,1.5,x1-1.85,H-0.30);
+    s.quadraticCurveTo(x1-2.15,H,x1-2.55,H);
+    s.lineTo(x0+r,H); s.quadraticCurveTo(x0,H,x0,H-r); s.lineTo(x0,0);
+  } else if(nose===-1){
+    s.moveTo(x1,0); s.lineTo(x0,0); s.lineTo(x0,0.55);
+    s.quadraticCurveTo(x0+0.25,1.5,x0+1.85,H-0.30);
+    s.quadraticCurveTo(x0+2.15,H,x0+2.55,H);
+    s.lineTo(x1-r,H); s.quadraticCurveTo(x1,H,x1,H-r); s.lineTo(x1,0);
+  } else {
+    s.moveTo(x0,0); s.lineTo(x1,0); s.lineTo(x1,H-r);
+    s.quadraticCurveTo(x1,H,x1-r,H); s.lineTo(x0+r,H);
+    s.quadraticCurveTo(x0,H,x0,H-r); s.lineTo(x0,0);
+  }
+  return s;
+}
+var bodyMat=new THREE.MeshStandardMaterial({roughness:0.3,metalness:0.42,transparent:true,opacity:1,side:THREE.DoubleSide});
+var glassMat=new THREE.MeshStandardMaterial({roughness:0.08,metalness:0.55,transparent:true,opacity:0.42});
+var doorMat=new THREE.MeshStandardMaterial({roughness:0.35,metalness:0.5,transparent:true,opacity:0.95});
+var trimMat=new THREE.MeshStandardMaterial({roughness:0.65,metalness:0.3});
+var bandMat=new THREE.MeshStandardMaterial({roughness:0.42,metalness:0.35});
+var sealMat=new THREE.MeshStandardMaterial({roughness:0.85,metalness:0.05});
+var lineMat=new THREE.MeshStandardMaterial({roughness:0.30,metalness:0.70});
+var kickMat=new THREE.MeshStandardMaterial({roughness:0.55,metalness:0.35});
+var roofMat=new THREE.MeshStandardMaterial({roughness:0.60,metalness:0.40});
+var darkMat=new THREE.MeshStandardMaterial({roughness:0.9});
+var floorMat=new THREE.MeshStandardMaterial({roughness:0.85});
+var seatMat=new THREE.MeshStandardMaterial({roughness:0.7});
+var poleMat=new THREE.MeshStandardMaterial({roughness:0.25,metalness:0.85});
+var ceilMat=new THREE.MeshStandardMaterial({roughness:0.8});
+var ledMat=new THREE.MeshStandardMaterial({emissive:0xffffff,emissiveIntensity:0.9,roughness:0.4});
+var paxMat=new THREE.MeshStandardMaterial({roughness:0.75,metalness:0.02});
+var gripMat=new THREE.MeshStandardMaterial({roughness:0.55,metalness:0.1});
+var noseMat=new THREE.MeshStandardMaterial({roughness:0.38,metalness:0.45});
+var screenMat=new THREE.MeshStandardMaterial({roughness:0.24,metalness:0.22,transparent:true,opacity:0.92,side:THREE.DoubleSide});
+var lampMat=new THREE.MeshStandardMaterial({emissive:0xfff0d0,emissiveIntensity:1.2,roughness:0.3});
+var glowMat=new THREE.MeshStandardMaterial({roughness:0.5});
+var linerMat=new THREE.MeshStandardMaterial({roughness:0.82,metalness:0.03});
+var paxRig=[];
+/* a jointed low-poly figure. Seated ones sit on the pad, standing ones reach a handhold. */
+function makePax(seated){
+  var G=new THREE.Group();
+  function part(geo,x,y,z,rx,rz){
+    var m=new THREE.Mesh(geo,paxMat); m.position.set(x,y,z);
+    if(rx) m.rotation.x=rx; if(rz) m.rotation.z=rz; return m;
+  }
+  var hipY = seated ? 0.02 : 0.86;
+  var torso=part(new THREE.CylinderGeometry(0.155,0.185,0.56,12), 0, hipY+0.30, 0);
+  G.add(torso);
+  var neck=part(new THREE.CylinderGeometry(0.055,0.065,0.09,8), 0, hipY+0.62, 0); G.add(neck);
+  var head=new THREE.Mesh(new THREE.SphereGeometry(0.113,16,12), paxMat);
+  head.position.set(0, hipY+0.735, 0); head.scale.set(1,1.1,0.94); G.add(head);
+  G.userData.head=head;
+  var shoulder=new THREE.Mesh(new THREE.CylinderGeometry(0.06,0.06,0.40,8), paxMat);
+  shoulder.rotation.z=Math.PI/2; shoulder.position.set(0,hipY+0.53,0); G.add(shoulder);
+  [-1,1].forEach(function(sd){
+    var arm=new THREE.Group(); arm.position.set(sd*0.20, hipY+0.52, 0);
+    var upper=part(new THREE.CylinderGeometry(0.048,0.044,0.30,8), 0,-0.15,0);
+    arm.add(upper);
+    var fore=part(new THREE.CylinderGeometry(0.042,0.038,0.28,8), 0,-0.44,0.02);
+    arm.add(fore);
+    if(seated){ arm.rotation.x=0.35; arm.rotation.z=sd*0.08; }
+    else if(sd>0){ arm.rotation.x=-2.55; }           /* raised to the grab handle */
+    else { arm.rotation.x=0.18; arm.rotation.z=0.10; }
+    G.add(arm); if(sd>0) G.userData.arm=arm;
+  });
+  [-1,1].forEach(function(sd){
+    var leg=new THREE.Group(); leg.position.set(sd*0.095, hipY+0.02, 0);
+    var thigh=part(new THREE.CylinderGeometry(0.068,0.060,0.40,8), 0,-0.20,0);
+    leg.add(thigh);
+    var shin=new THREE.Group(); shin.position.set(0,-0.40,0);
+    shin.add(part(new THREE.CylinderGeometry(0.055,0.048,0.40,8), 0,-0.20,0));
+    leg.add(shin);
+    if(seated){ leg.rotation.x=-1.48; shin.rotation.x=1.48; }
+    G.add(leg);
+  });
+  G.userData.seated=seated;
+  G.userData.ph=Math.random()*Math.PI*2;
+  return G;
+}
+function animatePax(t){
+  for(var i=0;i<paxRig.length;i++){
+    var f=paxRig[i], ph=f.userData.ph;
+    if(f.userData.head) f.userData.head.rotation.y = Math.sin(t*0.42+ph)*0.36;
+    if(!f.userData.seated){
+      f.rotation.z = Math.sin(t*1.25+ph)*0.016;      /* gentle sway with the ride */
+      if(f.userData.arm) f.userData.arm.rotation.z = Math.sin(t*1.25+ph)*0.05;
+    } else {
+      f.position.y = f.userData.y0===undefined ? (f.userData.y0=f.position.y) : f.userData.y0 + Math.sin(t*0.9+ph)*0.004;
+    }
+  }
+}
+/* an elongated vertical loop, the wall grab handle in the design visuals */
+var loopGeo=(function(){
+  var pts=[], R=0.085, Hh=0.30, i;
+  for(i=0;i<=14;i++){ var a=Math.PI*i/14; pts.push(new THREE.Vector2(Math.sin(a)*R, Hh/2+Math.cos(a)*R)); }
+  for(i=0;i<=14;i++){ var b=Math.PI*i/14; pts.push(new THREE.Vector2(-Math.sin(b)*R, -Hh/2-Math.cos(b)*R)); }
+  pts.push(pts[0].clone());
+  var path=new THREE.CatmullRomCurve3(pts.map(function(q){ return new THREE.Vector3(q.x,q.y,0); }), true);
+  return new THREE.TubeGeometry(path, 60, 0.016, 7, true);
+})();
+/* the hooked top of the aisle stanchion */
+var hookGeo=(function(){
+  var pts=[
+    new THREE.Vector3(0,-0.02,0), new THREE.Vector3(0,0.34,0), new THREE.Vector3(0,0.60,0),
+    new THREE.Vector3(0.015,0.74,0.05), new THREE.Vector3(0.02,0.78,0.15),
+    new THREE.Vector3(0.015,0.74,0.25), new THREE.Vector3(0,0.56,0.29),
+    new THREE.Vector3(0,0.30,0.30), new THREE.Vector3(0,0.14,0.30)
+  ];
+  var path=new THREE.CatmullRomCurve3(pts);
+  return new THREE.TubeGeometry(path, 70, 0.028, 8, false);
+})();
+/* a soft cantilevered seat pad */
+var seatPadGeo=(function(){
+  var g=roundPanel(0.80,0.52,0.20); g.rotateX(-Math.PI/2); g.scale(1,1,1); return g;
+})();
+
+var bodies=[], interiors=[], glasses=[], noseGlass=[], noseCaps=[];
+for(var ci=0;ci<3;ci++){ (function(i){
+  var g=new THREE.Group(); g.position.x=CARX[i];
+  var nose = i===0?-1:(i===2?1:0);
+  var geo=new THREE.ExtrudeGeometry(bodyShape(nose),{depth:W,bevelEnabled:true,bevelSize:0.10,bevelThickness:0.10,bevelSegments:4,curveSegments:14});
+  geo.translate(0,0,-W/2);
+  var body=new THREE.Mesh(geo, bodyMat.clone()); body.position.y=YB; g.add(body); bodies.push(body);
+  /* bodyside, following the client renders: a continuous dark glazing band with
+     rounded openings, thin accent lines sweeping off the nose, and a kick band */
+  var bandX0 = nose===-1 ? -3.10 : -5.72, bandX1 = nose===1 ? 3.10 : 5.72;
+  [-1,1].forEach(function(sz){
+    var zo = sz*(W/2+0.145);
+    var gb=new THREE.Mesh(new THREE.BoxGeometry(bandX1-bandX0,1.34,0.05), bandMat);
+    gb.position.set((bandX0+bandX1)/2, YB+1.44, zo); g.add(gb);
+    var winSeg = nose===0 ? [[-5.55,-3.45],[-1.35,1.35],[3.45,5.55]]
+               : nose===-1 ? [[-2.95,-0.95],[0.45,2.45],[3.55,5.55]]
+                           : [[-5.55,-3.55],[-2.45,-0.45],[0.95,2.95]];
+    winSeg.forEach(function(seg){
+      var wn=new THREE.Mesh(roundPanel(seg[1]-seg[0]-0.20,1.00,0.16), glassMat);
+      wn.position.set((seg[0]+seg[1])/2, YB+1.50, zo+0.012*sz); g.add(wn); glasses.push(wn);
+    });
+    DOOR_X.forEach(function(dx){
+      var dr=new THREE.Mesh(new THREE.BoxGeometry(1.86,2.10,0.055), doorMat);
+      dr.position.set(dx, YB+1.07, zo+0.004*sz); g.add(dr);
+      [-0.95,0,0.95].forEach(function(o){
+        var sl=new THREE.Mesh(new THREE.BoxGeometry(0.055,2.14,0.07), sealMat);
+        sl.position.set(dx+o, YB+1.07, zo+0.012*sz); g.add(sl);
+      });
+      [[1.62,0.86],[0.64,0.62]].forEach(function(q){
+        var dg=new THREE.Mesh(roundPanel(1.46,q[1],0.13), glassMat);
+        dg.position.set(dx, YB+q[0], zo+0.026*sz); g.add(dg); glasses.push(dg);
+      });
+    });
+    [0.60,0.70,0.80].forEach(function(yy){
+      var st=new THREE.Mesh(new THREE.BoxGeometry(bandX1-bandX0+0.6,0.022,0.03), lineMat);
+      st.position.set((bandX0+bandX1)/2, YB+yy, zo+0.01*sz); g.add(st);
+    });
+    var kk=new THREE.Mesh(new THREE.BoxGeometry(L-0.7,0.34,0.05), kickMat);
+    kk.position.set(0, YB+0.19, zo); g.add(kk);
+    if(nose!==0){
+      for(var q2=0;q2<6;q2++){
+        var sw2=new THREE.Mesh(new THREE.BoxGeometry(1.5+q2*0.20,0.018,0.03), lineMat);
+        sw2.position.set(nose*(L/2-1.55-(1.5+q2*0.20)/2), YB+0.52+q2*0.075, zo+0.012*sz);
+        sw2.rotation.z = -nose*0.055; g.add(sw2);
+      }
+    }
+  });
+  /* roof equipment, as in the client render */
+  (function(){
+    var rx = nose===0 ? 0 : -nose*1.4;
+    var lv=new THREE.Mesh(new THREE.BoxGeometry(2.3,0.07,1.05), roofMat);
+    lv.position.set(rx-1.5, YB+H+0.035, 0); g.add(lv);
+    [[-0.28,0.30],[0.32,0.34]].forEach(function(c){
+      var cy=new THREE.Mesh(new THREE.CylinderGeometry(c[1],c[1],0.09,20), roofMat);
+      cy.position.set(rx+0.9+c[0], YB+H+0.045, c[0]<0?0.34:-0.30); g.add(cy);
+    });
+    var pl=new THREE.Mesh(new THREE.BoxGeometry(1.5,0.05,0.9), roofMat);
+    pl.position.set(rx+2.3, YB+H+0.025, 0); g.add(pl);
+  })();
+  if(nose!==0){
+    var NP=noseOutline(nose);
+    /* a band of the nose outline, given a wall thickness so it is a skin and not a slab */
+    function skin(y0,y1,th,out){
+      var pts=[], q; out=out||0;
+      for(q=0;q<NP.length;q++){ if(NP[q].y>=y0-0.001 && NP[q].y<=y1+0.001) pts.push(NP[q]); }
+      if(pts.length<3) return null;
+      /* offset along the surface normal, not along x, so the skin keeps an even
+         thickness right round the curve instead of collapsing where it flattens */
+      var outer=[], inner=[];
+      for(q=0;q<pts.length;q++){
+        var a1=pts[Math.max(0,q-1)], b1=pts[Math.min(pts.length-1,q+1)];
+        var tx=b1.x-a1.x, ty=b1.y-a1.y, m=Math.sqrt(tx*tx+ty*ty)||1;
+        var nx=nose*ty/m, ny=-nose*tx/m;
+        outer.push(new THREE.Vector2(pts[q].x+nx*out,        pts[q].y+ny*out));
+        inner.push(new THREE.Vector2(pts[q].x-nx*(th-out),   pts[q].y-ny*(th-out)));
+      }
+      var sh=new THREE.Shape();
+      sh.moveTo(outer[0].x, outer[0].y);
+      for(q=1;q<outer.length;q++) sh.lineTo(outer[q].x, outer[q].y);
+      for(q=inner.length-1;q>=0;q--) sh.lineTo(inner[q].x, inner[q].y);
+      sh.lineTo(outer[0].x, outer[0].y);
+      return sh;
+    }
+    function panel(sh,depth,zc,mat,arr){
+      if(!sh) return null;
+      var gg=new THREE.ExtrudeGeometry(sh,{depth:depth,bevelEnabled:false,curveSegments:8});
+      gg.translate(0,0,-depth/2);
+      var mm=new THREE.Mesh(gg, mat); mm.position.set(0,YB,zc);
+      if(arr) arr.add(mm); return mm;
+    }
+    var YW0=1.18, YW1=H-0.30;
+    var NC=new THREE.Group();
+    var CLR=0.11;                                     /* clears the body bevel */
+    panel(skin(0,YW0,0.22,CLR+0.07),      W+0.14, 0, noseMat, NC);        /* lower fascia */
+    panel(skin(YW1,H,0.22,CLR+0.07),      W+0.14, 0, noseMat, NC);        /* brow         */
+    panel(skin(YW0,YW1,0.22,CLR+0.07), 0.30,  (W/2-0.04), noseMat, NC);   /* A pillars    */
+    panel(skin(YW0,YW1,0.22,CLR+0.07), 0.30, -(W/2-0.04), noseMat, NC);
+    [-1,1].forEach(function(sz){
+      var lamp=new THREE.Mesh(new THREE.BoxGeometry(0.09,0.15,0.36), lampMat);
+      lamp.position.set(nose*(L/2-0.18),YB+0.56,sz*0.90); NC.add(lamp);
+    });
+    var cpl=new THREE.Mesh(new THREE.BoxGeometry(0.40,0.30,0.66), noseMat);
+    cpl.position.set(nose*(L/2-0.08),YB+0.26,0); NC.add(cpl);
+    /* the windscreen is the same curve, glazed, sitting flush between the pillars */
+    var fg=panel(skin(YW0,YW1,0.13,CLR+0.06), W-0.42, 0, screenMat, null);
+    g.add(fg); glasses.push(fg); noseGlass.push(fg);
+    g.add(NC); noseCaps.push(NC);
+  }
+  [-3.9,3.9].forEach(function(bx){
+    var bg=new THREE.Mesh(new THREE.BoxGeometry(2.7,0.60,2.3), darkMat); bg.position.set(bx,0.62,0); g.add(bg);
+    [-1,1].forEach(function(sz){ [-0.9,0.9].forEach(function(ox){
+      var t=new THREE.Mesh(new THREE.CylinderGeometry(0.53,0.53,0.36,22), darkMat);
+      t.rotation.x=Math.PI/2; t.position.set(bx+ox,0.53,sz*1.24); g.add(t);
+    });});
+  });
+  var IN=new THREE.Group();
+  var cb=CEIL(i);
+  var fl=new THREE.Mesh(new THREE.BoxGeometry(L-0.4,0.05,W-0.3), floorMat); fl.position.set(0,YB+0.03,0); IN.add(fl);
+  var cl=new THREE.Mesh(new THREE.BoxGeometry(cb.len+0.2,0.06,W-0.5), ceilMat); cl.position.set(cb.mid,YB+2.34,0); IN.add(cl);
+  /* cream wall linings below the sill and above the window head, so the saloon
+     reads like the design visuals rather than showing the dark bodyside band */
+  [-1,1].forEach(function(sz){
+    var zl = sz*(W/2-0.10);
+    var lo=new THREE.Mesh(new THREE.BoxGeometry(cb.len,0.86,0.04), linerMat);
+    lo.position.set(cb.mid,YB+0.60,zl); IN.add(lo);
+    var hi=new THREE.Mesh(new THREE.BoxGeometry(cb.len,0.30,0.04), linerMat);
+    hi.position.set(cb.mid,YB+2.14,zl); IN.add(hi);
+    /* pillars between the window bays */
+    var pxs = nose===0 ? [-6,-3.0,-1.7,1.7,3.0,6] : (nose===-1 ? [-3.3,-0.5,0.8,3.0,4.3,5.8] : [-5.8,-4.3,-3.0,-0.8,0.5,3.3]);
+    pxs.forEach(function(px){
+      var pw=new THREE.Mesh(new THREE.BoxGeometry(0.30,1.10,0.04), linerMat);
+      pw.position.set(px,YB+1.48,zl); IN.add(pw);
+    });
+    var kp=new THREE.Mesh(new THREE.BoxGeometry(cb.len,0.22,0.05), kickMat);
+    kp.position.set(cb.mid,YB+0.16,sz*(W/2-0.13)); IN.add(kp);
+  });
+
+  /* cantilevered seat pads with an under-seat light strip, as in the design visuals */
+  var pads = nose===0 ? [-5.15,-4.25,-1.05,0,1.05,4.25,5.15]
+           : nose===-1 ? [-2.95,-2.05,0.35,1.25,4.25,5.15]
+                       : [-5.15,-4.25,-1.25,-0.35,2.05,2.95];
+  var seatSpots=[];
+  pads.forEach(function(px){
+    [-1,1].forEach(function(sz){
+      var pad=new THREE.Mesh(seatPadGeo, seatMat);
+      pad.position.set(px,YB+0.46,sz*(W/2-0.44)); pad.rotation.y=(sz>0?0:Math.PI); IN.add(pad);
+      var brk=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.34,0.14), trimMat);
+      brk.position.set(px,YB+0.30,sz*(W/2-0.17)); IN.add(brk);
+      var glow=new THREE.Mesh(new THREE.BoxGeometry(0.74,0.035,0.05), glowMat);
+      glow.position.set(px,YB+0.38,sz*(W/2-0.70)); IN.add(glow);
+      seatSpots.push([px,sz]);
+    });
+    /* seat back cushion against the wall */
+    [-1,1].forEach(function(sz){
+      var bk=new THREE.Mesh(roundPanel(0.80,0.50,0.16), seatMat);
+      bk.position.set(px,YB+0.80,sz*(W/2-0.16)); bk.rotation.y=(sz>0?0:Math.PI); IN.add(bk);
+    });
+  });
+
+  /* horizontal grab rail above the seats, and oval loop handles on the wall */
+  [-1,1].forEach(function(sz){
+    var hr=new THREE.Mesh(new THREE.CylinderGeometry(0.030,0.030,cb.len-0.5,10), poleMat);
+    hr.rotation.z=Math.PI/2; hr.position.set(cb.mid,YB+1.18,sz*(W/2-0.22)); IN.add(hr);
+    var loopX = nose===0 ? [-3.45,-2.25,2.25,3.45] : (nose===-1 ? [-1.05,0.25,2.85,4.05] : [-4.05,-2.85,-0.25,1.05]);
+    loopX.forEach(function(lx){
+      var lo=new THREE.Mesh(loopGeo, gripMat);
+      lo.position.set(lx,YB+1.62,sz*(W/2-0.20)); IN.add(lo);
+    });
+  });
+
+  /* aisle stanchions: a post that rises into a tall hooked grab, per the visuals */
+  var stanX = nose===0 ? [-3.6,0,3.6] : (nose===-1 ? [-2.5,0.9,4.4] : [-4.4,-0.9,2.5]);
+  var holdSpots=[];
+  stanX.forEach(function(px){
+    var foot=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.06,0.24), trimMat);
+    foot.position.set(px,YB+0.08,0); IN.add(foot);
+    var post=new THREE.Mesh(new THREE.CylinderGeometry(0.052,0.058,1.30,14), poleMat);
+    post.position.set(px,YB+0.72,0); IN.add(post);
+    var hook=new THREE.Mesh(hookGeo, poleMat);
+    hook.position.set(px,YB+1.37,0); IN.add(hook);
+    holdSpots.push(px);
+  });
+
+  /* linear ceiling lights and a centre air grille */
+  [-1,1].forEach(function(sz){
+    var lt=new THREE.Mesh(new THREE.BoxGeometry(cb.len-0.6,0.045,0.15), ledMat);
+    lt.position.set(cb.mid,YB+2.30,sz*(W/2-0.86)); IN.add(lt);
+  });
+  var gr=new THREE.Mesh(new THREE.BoxGeometry(cb.len*0.34,0.03,0.44), trimMat);
+  gr.position.set(cb.mid,YB+2.30,0); IN.add(gr);
+
+  /* a few passengers, some seated and some holding the stanchions */
+  var seatPick = nose===0 ? [[pads[0],1],[pads[3],-1],[pads[5],1]]
+               : nose===-1 ? [[pads[1],1],[pads[3],-1],[pads[5],1]]
+                           : [[pads[0],-1],[pads[2],1],[pads[4],-1]];
+  seatPick.forEach(function(w){
+    var fig=makePax(true);
+    fig.position.set(w[0], YB+0.51, w[1]*(W/2-0.56));
+    fig.rotation.y = w[1]>0 ? Math.PI : 0;
+    IN.add(fig); paxRig.push(fig);
+  });
+  holdSpots.forEach(function(px,k){
+    if(k===1) return;                       /* leave the middle stanchion clear */
+    var fig=makePax(false);
+    fig.position.set(px + (k===0?0.42:-0.42), YB+0.05, (k===0?0.30:-0.30));
+    fig.rotation.y = (k===0? -1.9 : 1.2);
+    IN.add(fig); paxRig.push(fig);
+  });
+
+  /* nose cars: wraparound bench under the windscreen, with a rail, and no bulkhead */
+  if(nose!==0){
+    var bx=nose*(L/2-1.28);
+    var bench=new THREE.Mesh(new THREE.BoxGeometry(0.66,0.10,W-0.80), seatMat);
+    bench.position.set(bx,YB+0.50,0); IN.add(bench);
+    var bbk=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.46,W-0.80), seatMat);
+    bbk.position.set(nose*(L/2-0.96),YB+0.78,0); IN.add(bbk);
+    var bglow=new THREE.Mesh(new THREE.BoxGeometry(0.05,0.035,W-0.86), glowMat);
+    bglow.position.set(nose*(L/2-1.58),YB+0.40,0); IN.add(bglow);
+    var rail=new THREE.Mesh(new THREE.CylinderGeometry(0.032,0.032,W-0.86,10), poleMat);
+    rail.rotation.x=Math.PI/2; rail.position.set(nose*(L/2-1.66),YB+1.06,0); IN.add(rail);
+    [-1,1].forEach(function(sz){
+      var up=new THREE.Mesh(new THREE.CylinderGeometry(0.030,0.030,1.02,10), poleMat);
+      up.position.set(nose*(L/2-1.66),YB+0.56,sz*((W-0.86)/2)); IN.add(up);
+    });
+    var stow=new THREE.Mesh(new THREE.BoxGeometry(0.80,0.40,W-0.90), trimMat);
+    stow.position.set(nose*(L/2-0.72),YB+0.26,0); IN.add(stow);
+    seatSpots.push([bx,1],[bx,-1]);
+  }
+  g.add(IN); interiors.push(IN);
+  scene.add(g);
+})(ci); }
+
+var markers=[];
+function markerGeo(shape, sz){
+  if(shape==="dome"){ var g=new THREE.SphereGeometry(0.13,16,10,0,Math.PI*2,Math.PI/2,Math.PI/2); g.rotateX(Math.PI); return g; }
+  if(shape==="disc") return new THREE.CylinderGeometry(0.15,0.15,0.06,20);
+  if(shape==="sidespk"){ var c=new THREE.CylinderGeometry(0.13,0.13,0.09,20); c.rotateX(Math.PI/2); return c; }
+  if(shape==="panel") return new THREE.BoxGeometry(0.46,0.30,0.06);
+  if(shape==="band") return new THREE.BoxGeometry(sz[0],sz[1],sz[2]);
+  if(shape==="wedge") return new THREE.BoxGeometry(0.22,0.34,0.22);
+  if(shape==="console") return new THREE.BoxGeometry(0.42,0.26,0.90);
+  return new THREE.BoxGeometry(0.40,0.16,0.34);
+}
+/* the surround display. Drawn to a canvas, scrolled round the band, and shown only
+   on the inward face so it does not read through the bodyside from outside. */
+function pidsCanvas(){
+  var cv=document.createElement("canvas"); cv.width=2048; cv.height=96;
+  var x=cv.getContext("2d");
+  x.fillStyle="#06080A"; x.fillRect(0,0,2048,96);
+  function plane(cx,cy,sc){
+    x.save(); x.translate(cx,cy); x.scale(sc,sc); x.fillStyle="#FFD98A";
+    x.beginPath();
+    x.moveTo(30,0); x.lineTo(6,5); x.lineTo(-14,5); x.lineTo(-30,22); x.lineTo(-20,22);
+    x.lineTo(-2,5.5); x.lineTo(-16,5.5); x.lineTo(-24,13); x.lineTo(-30,13); x.lineTo(-26,3);
+    x.lineTo(-30,-7); x.lineTo(-24,-7); x.lineTo(-16,0.5); x.lineTo(-2,0.5); x.lineTo(-20,-17);
+    x.lineTo(-30,-17); x.lineTo(-14,0); x.closePath(); x.fill();
+    x.restore();
+  }
+  function tower(cx,cy,sc){
+    x.save(); x.translate(cx,cy); x.scale(sc,sc); x.fillStyle="#FFD98A";
+    x.fillRect(-3,-4,6,26);            /* mast     */
+    x.fillRect(-10,-14,20,10);         /* cab      */
+    x.fillRect(-13,-17,26,3);          /* roof     */
+    x.fillRect(-16,20,32,4);           /* podium   */
+    x.restore();
+  }
+  var unit=[];
+  x.font="600 40px 'IBM Plex Sans',-apple-system,'Segoe UI',sans-serif";
+  x.textBaseline="middle";
+  var t1="Al Maktoum International Airport (DWC)";
+  var t2="Next station   West Terminal";
+  var w1=x.measureText(t1).width, w2=x.measureText(t2).width;
+  var step = 150 + w1 + 90 + w2 + 90;
+  var k=-step;
+  while(k < 2048+step){
+    plane(k+42, 48, 1.05);
+    tower(k+118, 44, 0.95);
+    x.fillStyle="#FFE6A8"; x.fillText(t1, k+150, 50);
+    x.fillStyle="#8FA8B8"; x.fillText("·", k+150+w1+42, 50);
+    x.fillStyle="#EBDCC0"; x.fillText(t2, k+150+w1+90, 50);
+    x.fillStyle="#8FA8B8"; x.fillText("·", k+150+w1+90+w2+42, 50);
+    k += step;
+  }
+  return cv;
+}
+var PIDS_CV=pidsCanvas();
+function pidsTexture(rep){
+  var t=new THREE.CanvasTexture(PIDS_CV);
+  t.wrapS=THREE.RepeatWrapping; t.wrapT=THREE.ClampToEdgeWrapping;
+  t.repeat.set(rep,1); t.anisotropy=4;
+  return t;
+}
+var pidsLong=pidsTexture(4), pidsEnd=pidsTexture(1.1);
+/* the two long faces take opposite UV directions, so one needs a mirrored copy
+   or the wording reads backwards down one side of the saloon */
+var pidsLongM=pidsTexture(-4), pidsEndM=pidsTexture(-1.1);
+var bandBackMat=new THREE.MeshStandardMaterial({color:0xB9BFC4, roughness:0.6, transparent:true, opacity:1});
+function pidsFace(tex){
+  return new THREE.MeshStandardMaterial({map:tex, emissive:0xffffff, emissiveMap:tex,
+    emissiveIntensity:1.0, color:0x05070A, roughness:0.5, transparent:true, opacity:1});
+}
+/* BoxGeometry material order is +x, -x, +y, -y, +z, -z */
+function bandMats(idx){
+  var k=idx%4;
+  var face = (k<2) ? pidsFace(pidsLong) : pidsFace(pidsEnd);
+  var slot = k===0 ? 5 : (k===1 ? 4 : (k===2 ? 0 : 1));
+  var arr=[];
+  for(var q=0;q<6;q++) arr.push(q===slot ? face : bandBackMat);
+  arr.face=face;
+  return arr;
+}
+/* CCTV coverage, one cone per camera */
+var camCones=new THREE.Group(); camCones.visible=false; scene.add(camCones);
+var camConeMat=new THREE.MeshBasicMaterial({transparent:true,opacity:0.16,depthWrite:false,side:THREE.DoubleSide});
+var coneGeo=(function(){ var g=new THREE.ConeGeometry(1,1,28,1,true); g.translate(0,-0.5,0); return g; })();
+var UPN=new THREE.Vector3(0,-1,0), CDIR=new THREE.Vector3();
+
+EQ.forEach(function(e){
+  e.pos.forEach(function(p,idx){
+    var isBand=(e.id==="band");
+    var mat = isBand ? bandMats(idx)
+                     : new THREE.MeshStandardMaterial({roughness:0.4,metalness:0.15,transparent:true,opacity:1});
+    var m=new THREE.Mesh(markerGeo(e.shape, e.sizes?e.sizes[idx]:null), mat);
+    m.position.set(p[0],p[1],p[2]);
+    m.userData={id:e.id, sub:e.sub, isBand:(e.id==="band"), idx:idx};
+    if(isBand) m.userData.face=mat.face;
+    scene.add(m); markers.push(m);
+    if(e.id==="cam"){
+      /* each camera looks the length of the saloon towards the far end, so the two
+         between them cover the whole car including the ground under the other one */
+      var pair = e.pos[(idx%2) ? idx-1 : idx+1];
+      var run  = Math.abs(pair[0]-p[0]) + 1.25;
+      var drop = (p[1]-0.06) - (YB+0.15);
+      var cone=new THREE.Mesh(coneGeo, camConeMat);
+      cone.position.set(p[0],p[1]-0.06,p[2]);
+      CDIR.set((pair[0]>p[0] ? 1 : -1)*run, -drop, 0).normalize();
+      cone.quaternion.setFromUnitVectors(UPN, CDIR);
+      var len=Math.sqrt(run*run + drop*drop);
+      cone.scale.set(1.42, len, 1.42);
+      camCones.add(cone);
+    }
+  });
+});
+var CAMCOV=true;
+function syncCam(){
+  camCones.visible = CAMCOV && selected==="cam" && active.cctv && mode!=="roof";
+}
+
+var flowGroup=new THREE.Group(); flowGroup.visible=false; scene.add(flowGroup);
+var flows=[];
+function addFlow(pts,k){
+  var v=pts.map(function(p){return new THREE.Vector3(p[0],p[1],p[2]);});
+  var line=new THREE.Line(new THREE.BufferGeometry().setFromPoints(v), new THREE.LineBasicMaterial({transparent:true,opacity:0.35}));
+  flowGroup.add(line);
+  var dot=new THREE.Mesh(new THREE.SphereGeometry(0.075,10,8), new THREE.MeshBasicMaterial({}));
+  flowGroup.add(dot);
+  flows.push({pts:v,dot:dot,line:line,key:k,t:Math.random()});
+}
+for(var c2=0;c2<3;c2++){
+  var rk = P(c2,0.9,0.30,1.05);
+  addFlow([P(c2,-3.3,2.30,0), P(c2,-3.3,1.2,0.6), rk], "cctv");
+  addFlow([P(c2,3.3,2.30,0), P(c2,3.3,1.2,0.6), rk], "cctv");
+  addFlow([rk, P(c2,0,2.12,1.31)], "pids");
+  addFlow([rk, P(c2,0,2.30,0)], "pa");
+}
+addFlow([P(0,0.9,0.30,1.05), P(0,-4.3,2.60,0.62), P(0,-4.3,3.9,0.62), [-24,7.5,3.5]], "radio");
+addFlow([P(2,0.9,0.30,1.05), P(2,4.3,2.60,0.62), P(2,4.3,3.9,0.62), [24,7.5,3.5]], "radio");
+addFlow([P(0,0.9,0.30,1.05), P(1,0.9,0.30,1.05)], "net");
+addFlow([P(1,0.9,0.30,1.05), P(2,0.9,0.30,1.05)], "net");
+
+
+/* ============ non-signalling bearers, our scope ============ */
+var B58C={l:0x0B6E85,d:0x48BDD6}, LTEC={l:0xA62B62,d:0xF07AAE};
+var mat58=new THREE.MeshStandardMaterial({roughness:0.45,metalness:0.2,emissiveIntensity:0.35});
+var matLte=new THREE.MeshStandardMaterial({roughness:0.45,metalness:0.2,emissiveIntensity:0.35});
+var line58=new THREE.LineBasicMaterial({transparent:true,opacity:0.65});
+var lineLte=new THREE.LineBasicMaterial({transparent:true,opacity:0.65});
+var g58=new THREE.Group(); scenery.add(g58);
+var gLte=new THREE.Group(); scenery.add(gLte);
+var obNsg=new THREE.Group(); scene.add(obNsg);
+
+var CHL=[0xD9532B,0xC7900F,0x17808F];   /* F1 F2 F3, light */
+var CHD=[0xF2724A,0xE8B33F,0x43BACD];   /* F1 F2 F3, dark  */
+var chHw=[0,1,2].map(function(){ return new THREE.MeshStandardMaterial({roughness:0.42,metalness:0.25,emissiveIntensity:0.35}); });
+var chLobe=[0,1,2].map(function(){ return new THREE.MeshBasicMaterial({transparent:true,opacity:0.085,depthWrite:false,side:THREE.DoubleSide}); });
+var chLine=[0,1,2].map(function(){ return new THREE.LineBasicMaterial({transparent:true,opacity:0.75}); });
+
+var AP_STEP=18, LOBE_HALF=20, AP_Z=-4.1, AP_Y=4.85;
+var lobeGeo=new THREE.SphereGeometry(1,22,14);
+var chRing=[0,1,2].map(function(){ return new THREE.LineBasicMaterial({transparent:true,opacity:0.9}); });
+var chFoot=[0,1,2].map(function(){ return new THREE.MeshBasicMaterial({transparent:true,opacity:0.20,depthWrite:false,side:THREE.DoubleSide}); });
+var ringGeo=(function(){
+  var pts=[]; for(var a=0;a<72;a++){ var t=a/72*Math.PI*2; pts.push(new THREE.Vector3(Math.cos(t),0,Math.sin(t))); }
+  return new THREE.BufferGeometry().setFromPoints(pts);
+})();
+var footGeo=(function(){ var g=new THREE.CircleGeometry(1,72); g.rotateX(-Math.PI/2); return g; })();
+var n58=[], nLte=[], lobeVol=[], lobeFoot=[];
+for(var bX=-SPAN; bX<=SPAN; bX+=AP_STEP){
+  var ci=((n58.length%3)+3)%3, hw=chHw[ci];
+  var b1=new THREE.Mesh(new THREE.BoxGeometry(0.64,0.34,0.64), hw); b1.position.set(bX,-0.20,AP_Z); g58.add(b1);
+  var m1=new THREE.Mesh(new THREE.CylinderGeometry(0.13,0.20,5.5,10), hw); m1.position.set(bX,2.35,AP_Z); g58.add(m1);
+  var cab=new THREE.Mesh(new THREE.BoxGeometry(0.46,0.86,0.40), hw); cab.position.set(bX,1.40,AP_Z-0.30); g58.add(cab);
+  /* directional panel antenna, face turned towards the track */
+  var pnl=new THREE.Mesh(new THREE.BoxGeometry(0.26,1.35,0.80), hw);
+  pnl.position.set(bX,AP_Y,AP_Z+0.42); pnl.rotation.x=0.18; g58.add(pnl);
+  /* the coverage lobe it paints along the guideway */
+  var lb=new THREE.Mesh(lobeGeo, chLobe[ci]);
+  lb.position.set(bX,4.40,-1.60);
+  lb.scale.set(LOBE_HALF,2.20,7.0);
+  lb.renderOrder=2; g58.add(lb); lobeVol.push(lb);
+  /* its footprint on the guideway, so the overlap is unmistakable */
+  var yf=0.06+ci*0.025;
+  var foot=new THREE.Mesh(footGeo, chFoot[ci]);
+  foot.position.set(bX,yf,0); foot.scale.set(LOBE_HALF,1,9.0);
+  foot.renderOrder=3; g58.add(foot); lobeFoot.push(foot);
+  var ring=new THREE.LineLoop(ringGeo, chRing[ci]);
+  ring.position.set(bX,yf+0.01,0); ring.scale.set(LOBE_HALF,1,9.0);
+  ring.renderOrder=4; g58.add(ring); lobeFoot.push(ring);
+  n58.push({p:new THREE.Vector3(bX,AP_Y,AP_Z+0.5), ch:ci, id:n58.length+1});
+}
+var TETC={l:0xA5501F,d:0xDD8B4B};
+var matTet=new THREE.MeshStandardMaterial({roughness:0.45,metalness:0.2,emissiveIntensity:0.35});
+var lineTet=new THREE.LineBasicMaterial({transparent:true,opacity:0.7});
+var gTet=new THREE.Group(); scenery.add(gTet);
+var nTet=[];
+for(var tX=-SPAN; tX<=SPAN; tX+=120){
+  var tb=new THREE.Mesh(new THREE.BoxGeometry(1.05,0.46,1.05), matTet); tb.position.set(tX,-0.16,-9.4); gTet.add(tb);
+  var tm=new THREE.Mesh(new THREE.CylinderGeometry(0.09,0.17,9.6,8), matTet); tm.position.set(tX,4.70,-9.4); gTet.add(tm);
+  [0,1,2].forEach(function(k){
+    var an=k*Math.PI*2/3+0.5;
+    var wh=new THREE.Mesh(new THREE.CylinderGeometry(0.045,0.045,1.45,7), matTet);
+    wh.position.set(tX+Math.cos(an)*0.42, 9.30, -9.4+Math.sin(an)*0.42); gTet.add(wh);
+  });
+  var xa=new THREE.Mesh(new THREE.BoxGeometry(0.10,0.10,1.5), matTet); xa.position.set(tX,8.55,-9.4); gTet.add(xa);
+  nTet.push({p:new THREE.Vector3(tX,9.60,-9.4), ch:-1, id:nTet.length+1});
+}
+for(var lX=-SPAN; lX<=SPAN; lX+=72){
+  var b2=new THREE.Mesh(new THREE.BoxGeometry(0.85,0.40,0.85), matLte); b2.position.set(lX,-0.18,-6.6); gLte.add(b2);
+  var m2=new THREE.Mesh(new THREE.CylinderGeometry(0.10,0.14,6.4,10), matLte); m2.position.set(lX,3.15,-6.6); gLte.add(m2);
+  [0,1,2].forEach(function(k){
+    var a=k*Math.PI*2/3;
+    var pn=new THREE.Mesh(new THREE.BoxGeometry(0.14,0.95,0.40), matLte);
+    pn.position.set(lX+Math.cos(a)*0.42, 6.00, -6.6+Math.sin(a)*0.42);
+    pn.rotation.y=-a; gLte.add(pn);
+  });
+  nLte.push({p:new THREE.Vector3(lX,6.20,-6.6), ch:-1, id:nLte.length+1});
+}
+
+/* two onboard radios, one at each end of the train */
+var obA=(function(){ var q=P(0,-3.2,2.92,0.62); return new THREE.Vector3(q[0],q[1],q[2]); })();
+var obB=(function(){ var q=P(2, 3.2,2.92,0.62); return new THREE.Vector3(q[0],q[1],q[2]); })();
+var ob1=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.36,0.30), mat58);
+ob1.position.set(obA.x,obA.y-0.12,obA.z); obNsg.add(ob1);
+var ob2=new THREE.Mesh(new THREE.BoxGeometry(0.30,0.36,0.30), mat58);
+ob2.position.set(obB.x,obB.y-0.12,obB.z); obNsg.add(ob2);
+
+function mkLink(mat){
+  var g=new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3()]);
+  var ln=new THREE.Line(g,mat); obNsg.add(ln);
+  var dt=new THREE.Mesh(new THREE.SphereGeometry(0.10,10,8), new THREE.MeshBasicMaterial({})); obNsg.add(dt);
+  return {geo:g, line:ln, dot:dt, t:Math.random()};
+}
+/* a radio keeps its old cell up while the new one comes in, so the roam is visible */
+function mkRadio(){
+  return {live:mkLink(new THREE.LineBasicMaterial({transparent:true,opacity:0.8})),
+          old :mkLink(new THREE.LineBasicMaterial({transparent:true,opacity:0.0})),
+          cur:-1, prev:-1, hold:0};
+}
+var rdA=mkRadio(), rdB=mkRadio(), rdL=mkRadio(), rdT=mkRadio();
+var HOLD=1.6;   /* seconds the previous cell is held before it is released */
+var pT=new THREE.Vector3();
+function nearestNode(nodes, ax, skip){
+  var best=-1, bd=1e9;
+  for(var i=0;i<nodes.length;i++){
+    if(i===skip) continue;
+    var wx=nodes[i].p.x+scenery.position.x;
+    var d=Math.abs(wx-ax);
+    if(d<bd){ bd=d; best=i; }
+  }
+  return best;
+}
+function drawLink(lk, node, anchor, dt, op){
+  pT.set(node.p.x+scenery.position.x, node.p.y, node.p.z);
+  var pa=lk.geo.attributes.position;
+  pa.setXYZ(0,anchor.x,anchor.y,anchor.z); pa.setXYZ(1,pT.x,pT.y,pT.z);
+  pa.needsUpdate=true; lk.geo.computeBoundingSphere();
+  lk.t+=dt*0.85; if(lk.t>1) lk.t-=1;
+  lk.dot.position.lerpVectors(anchor,pT,lk.t);
+  lk.line.material.opacity=op;
+  lk.dot.material.opacity=op; lk.dot.material.transparent=true;
+}
+/* fixed is a colour to use when the bearer has no per-cell channel plan */
+function stepRadio(rd, nodes, anchor, dt, skip, fixed){
+  var n=nearestNode(nodes, anchor.x, skip);
+  if(n!==rd.cur){ rd.prev=rd.cur; rd.hold=HOLD; rd.cur=n; }
+  if(rd.hold>0) rd.hold-=dt;
+  var cn=nodes[rd.cur];
+  var cc = fixed || chLine[cn.ch].color;
+  rd.live.line.material.color.copy(cc);
+  rd.live.dot.material.color.copy(cc);
+  var f = rd.hold>0 ? Math.min(1,(HOLD-rd.hold)/HOLD) : 1;
+  drawLink(rd.live, cn, anchor, dt, 0.35+0.55*f);
+  var releasing = rd.hold>0 && rd.prev>=0;
+  rd.old.line.visible=rd.old.dot.visible=releasing;
+  if(releasing){
+    var pn=nodes[rd.prev];
+    var pc = fixed || chLine[pn.ch].color;
+    rd.old.line.material.color.copy(pc);
+    rd.old.dot.material.color.copy(pc);
+    drawLink(rd.old, pn, anchor, dt, 0.75*(rd.hold/HOLD));
+  }
+  return rd.cur;
+}
+var COV3D=true, hud2=document.getElementById("hud2"), lastAssoc="";
+var CHN=["F1","F2","F3"];
+function setLobes(){
+  var on = COV3D && g58.visible && mode!=="inside";
+  var i;
+  for(i=0;i<lobeVol.length;i++)  lobeVol[i].visible  = on;
+  for(i=0;i<lobeFoot.length;i++) lobeFoot[i].visible = on && mode==="wayside";
+}
+function showRadio(rd,on){
+  rd.live.line.visible=rd.live.dot.visible=on;
+  if(!on){ rd.old.line.visible=rd.old.dot.visible=false; }
+}
+window.setBearer3D=function(b){
+  g58.visible=!!b.b58;  showRadio(rdA,!!b.b58); showRadio(rdB,!!b.b58);
+  gLte.visible=!!b.lte; showRadio(rdL,!!b.lte);
+  gTet.visible=!!b.tet; showRadio(rdT,!!b.tet);
+  obNsg.visible = !!(b.b58||b.lte||b.tet);
+  ob1.material = ob2.material = b.b58 ? chHw[0] : (b.lte ? matLte : matTet);
+  setLobes();
+  hud2.hidden = !(b.b58||b.lte||b.tet);
+};
+document.getElementById("camcov").addEventListener("click", function(e){
+  CAMCOV=!CAMCOV;
+  e.currentTarget.setAttribute("aria-pressed", String(CAMCOV));
+  syncCam();
+});
+document.getElementById("cov3d").addEventListener("click", function(e){
+  COV3D=!COV3D;
+  e.currentTarget.setAttribute("aria-pressed", String(COV3D));
+  setLobes();
+});
+function updateNsg(dt){
+  var dark=currentDark(), P58=dark?CHD:CHL, rows=[];
+  function sw(c){ return '<span class="c" style="background:#'+("000000"+c.toString(16)).slice(-6)+'"></span>'; }
+  var key="";
+  if(g58.visible){
+    var iA=stepRadio(rdA, n58, obB, dt, -1);
+    var iB=stepRadio(rdB, n58, obA, dt, iA);
+    var nA=n58[iA], nB=n58[iB];
+    ob1.material = chHw[nB.ch]; ob2.material = chHw[nA.ch];
+    var roamA=rdA.hold>0, roamB=rdB.hold>0;
+    rows.push(sw(P58[nA.ch])+'5.8 GHz front &#8594; <b>AP-'+nA.id+'</b> on <b>'+CHN[nA.ch]+'</b>'+
+      (roamA&&rdA.prev>=0 ? ' <i style="color:var(--accent);font-style:normal">holding AP-'+n58[rdA.prev].id+'</i>' : ''));
+    rows.push(sw(P58[nB.ch])+'5.8 GHz rear &#8594; <b>AP-'+nB.id+'</b> on <b>'+CHN[nB.ch]+'</b>'+
+      (roamB&&rdB.prev>=0 ? ' <i style="color:var(--accent);font-style:normal">holding AP-'+n58[rdB.prev].id+'</i>' : ''));
+    key += "A"+nA.id+"B"+nB.id+(roamA?1:0)+(roamB?1:0);
+  }
+  if(gLte.visible){
+    var hL=dark?LTEC.d:LTEC.l;
+    var iL=stepRadio(rdL, nLte, obA, dt, -1, new THREE.Color(hL));
+    rows.push(sw(hL)+'private LTE &#8594; <b>eNB-'+nLte[iL].id+'</b>'+
+      (rdL.hold>0&&rdL.prev>=0 ? ' <i style="color:var(--accent);font-style:normal">holding eNB-'+nLte[rdL.prev].id+'</i>' : ''));
+    key += "L"+nLte[iL].id+(rdL.hold>0?1:0);
+  }
+  if(gTet.visible){
+    var hT=dark?TETC.d:TETC.l;
+    var iT=stepRadio(rdT, nTet, obB, dt, -1, new THREE.Color(hT));
+    rows.push(sw(hT)+'TETRA voice &#8594; <b>BS-'+nTet[iT].id+'</b>'+
+      (rdT.hold>0&&rdT.prev>=0 ? ' <i style="color:var(--accent);font-style:normal">holding BS-'+nTet[rdT.prev].id+'</i>' : ''));
+    key += "T"+nTet[iT].id+(rdT.hold>0?1:0);
+  }
+  if(key!==lastAssoc && rows.length){
+    lastAssoc=key;
+    var roaming = rdA.hold>0||rdB.hold>0||rdL.hold>0||rdT.hold>0;
+    hud2.innerHTML = rows.join('<br>')+'<br>'+
+      (roaming ? 'make before break &#183; old cell held until the new one is stable'
+               : 'all links stable &#183; overlapping coverage');
+  }
+}
+
+window.applySceneTheme=function(dark){
+  var bg=dark?0x0A0E12:0xEEEDE9;
+  scene.background=new THREE.Color(bg);
+  window.__fogNear = dark?46:52;
+  window.__fogFar  = dark?112:124;
+  var fn = window.__wide ? (dark?90:100)  : window.__fogNear;
+  var ff = window.__wide ? (dark?300:330) : window.__fogFar;
+  scene.fog=new THREE.Fog(bg, fn, ff);
+  hemi.groundColor.setHex(dark?0x11161b:0xbfc4c8); hemi.intensity=dark?0.75:0.95;
+  /* warm pearl bodyside, bronze glazing band and rose gold interior metal,
+     taken from the client design visuals */
+  bodies.forEach(function(b){ b.material.color.setHex(dark?0xBFB4AE:0xF2EAE4); });
+  bandMat.color.setHex(dark?0x3B332F:0x6E625C);
+  sealMat.color.setHex(dark?0x14171A:0x1E2225);
+  lineMat.color.setHex(dark?0xD8A98A:0xC49274);
+  kickMat.color.setHex(dark?0x4A423D:0x8C7F77);
+  roofMat.color.setHex(dark?0x8D8681:0xC9C2BC);
+  glassMat.color.setHex(dark?0x1B2A31:0x5C7883);
+  doorMat.color.setHex(dark?0x4B423D:0x8A7E77);
+  trimMat.color.setHex(dark?0x3A332F:0x9C918A);
+  darkMat.color.setHex(dark?0x14181C:0x3E4448);
+  guideMat.color.setHex(dark?0x1a2229:0xC2C6C4);
+  railMat.color.setHex(dark?0x2b3841:0xA8ADAB);
+  floorMat.color.setHex(dark?0x3A322E:0xC9B4A6);
+  seatMat.color.setHex(dark?0x6E6560:0xD8D2CC);
+  ceilMat.color.setHex(dark?0x3A3733:0xF4F0EC);
+  poleMat.color.setHex(dark?0xE0A780:0xD79C77);
+  gripMat.color.setHex(dark?0xE7B492:0xDFAA85);
+  paxMat.color.setHex(dark?0x6B7078:0x8A8F96);
+  noseMat.color.setHex(dark?0xBFB4AE:0xF0E7E1);
+  screenMat.color.setHex(dark?0x0E1E27:0x2C3F4B);
+  ledMat.emissiveIntensity = dark?1.0:0.45;
+  glowMat.color.setHex(0xFFCE94); glowMat.emissive=new THREE.Color(0xFFB765);
+  glowMat.emissiveIntensity = dark?1.5:0.95;
+  linerMat.color.setHex(dark?0x4A443F:0xEDE4DC);
+  tieMat.color.setHex(dark?0x232c33:0xB6BAB7);
+  var h58=dark?B58C.d:B58C.l, hlte=dark?LTEC.d:LTEC.l, htet=dark?TETC.d:TETC.l;
+  mat58.color.setHex(h58); mat58.emissive=new THREE.Color(h58);
+  matLte.color.setHex(hlte); matLte.emissive=new THREE.Color(hlte);
+  matTet.color.setHex(htet); matTet.emissive=new THREE.Color(htet);
+  line58.color.setHex(h58); lineLte.color.setHex(hlte); lineTet.color.setHex(htet);
+  var P58 = dark?CHD:CHL;
+  for(var q=0;q<3;q++){
+    chHw[q].color.setHex(P58[q]); chHw[q].emissive=new THREE.Color(P58[q]);
+    chLobe[q].color.setHex(P58[q]); chLobe[q].opacity = dark?0.075:0.06;
+    chRing[q].color.setHex(P58[q]); chRing[q].opacity = dark?0.95:0.85;
+    chFoot[q].color.setHex(P58[q]); chFoot[q].opacity = dark?0.28:0.26;
+    chLine[q].color.setHex(P58[q]);
+  }
+  lastAssoc="";
+  grid.material.color.setHex(dark?0x1e2830:0xD5D3CD);
+  grid.material.transparent=true; grid.material.opacity=dark?0.75:0.6;
+  markers.forEach(function(m){
+    if(m.userData.isBand){ m.userData.face.emissiveIntensity = dark?1.05:0.9; return; }
+    var s=SUBS[m.userData.sub], hx=dark?s.hexD:s.hex;
+    m.material.color.setHex(hx); m.material.emissive=new THREE.Color(hx);
+    m.material.emissiveIntensity = dark?0.5:0.22;
+  });
+  camConeMat.color.setHex(dark?SUBS.cctv.hexD:SUBS.cctv.hex);
+  bandBackMat.color.setHex(dark?0x2A3138:0xB9BFC4);
+  flows.forEach(function(f){ var s=SUBS[f.key], hx=dark?s.hexD:s.hex; f.line.material.color.setHex(hx); f.dot.material.color.setHex(hx); });
+  if(selected) select(selected,true);
+};
+
+/* panels */
+var active={}; Object.keys(SUBS).forEach(function(k){active[k]=true;});
+var selected=null;
+var layersEl=document.getElementById("layers");
+Object.keys(SUBS).forEach(function(k){
+  var s=SUBS[k];
+  var n=EQ.filter(function(e){return e.sub===k;}).reduce(function(a,e){return a+e.qty[0]+e.qty[1]+e.qty[2];},0);
+  if(!n) return;
+  var b=document.createElement("button");
+  b.className="lay"; b.setAttribute("aria-pressed","true"); b.style.setProperty("--c",s.c);
+  b.innerHTML='<span class="swatch"></span><span class="nm">'+s.name+'</span><span class="ct">'+n+'</span>';
+  b.addEventListener("click", function(){
+    active[k]=!active[k]; b.setAttribute("aria-pressed",String(active[k]));
+    applyLayers(); renderItems();
+  });
+  layersEl.appendChild(b);
+});
+document.getElementById("totall").textContent = EQ.reduce(function(a,e){return a+e.qty[0]+e.qty[1]+e.qty[2];},0)+" units";
+
+var itemsEl=document.getElementById("items");
+function renderItems(){
+  itemsEl.innerHTML="";
+  EQ.filter(function(e){return active[e.sub];}).forEach(function(e){
+    var t=e.qty[0]+e.qty[1]+e.qty[2];
+    var b=document.createElement("button");
+    b.className="row"+(selected===e.id?" sel":"");
+    b.style.setProperty("--c",SUBS[e.sub].c);
+    b.innerHTML='<span class="dot"></span><span class="nm">'+e.name+'</span><span class="q">'+t+'</span>';
+    b.addEventListener("click", function(){ select(e.id); });
+    itemsEl.appendChild(b);
+  });
+}
+renderItems();
+
+var stripEl=document.getElementById("strip");
+function renderStrip(e){
+  if(!e){ stripEl.innerHTML='<div class="l"><div class="m">Select a subsystem, or click any item in the model.</div></div>'; return; }
+  var t=e.qty[0]+e.qty[1]+e.qty[2];
+  stripEl.innerHTML='<div class="l"><div><h4>'+e.name+'</h4><div class="m">'+e.model+' &nbsp;·&nbsp; '+e.mount+'</div></div></div>'+
+    '<div class="qs"><div><b>'+e.qty[0]+'</b><span>CAR A</span></div><div><b>'+e.qty[1]+'</b><span>CAR B</span></div><div><b>'+e.qty[2]+'</b><span>CAR C</span></div><div><b>'+t+'</b><span>TRAIN</span></div></div>';
+}
+renderStrip(null);
+
+/* camera */
+var mode="ext";
+var orb={theta:-0.68,phi:1.16,dist:44};
+var target=new THREE.Vector3(0,1.5,0);
+var walkS={x:0,yaw:0,pitch:0,dir:1};
+function place(){
+  if(mode==="inside"){
+    camera.fov=62;
+    camera.position.set(walkS.x,YB+1.62,-0.34);
+    var d=new THREE.Vector3(Math.cos(walkS.pitch)*Math.cos(walkS.yaw)*walkS.dir, Math.sin(walkS.pitch), Math.cos(walkS.pitch)*Math.sin(walkS.yaw));
+    camera.lookAt(camera.position.clone().add(d));
+  } else {
+    camera.fov=45;
+    var st=Math.sin(orb.phi), ct=Math.cos(orb.phi);
+    camera.position.set(target.x+orb.dist*st*Math.sin(orb.theta), target.y+orb.dist*ct, target.z+orb.dist*st*Math.cos(orb.theta));
+    camera.lookAt(target);
+  }
+  camera.updateProjectionMatrix();
+}
+var drag=null;
+cv.addEventListener("pointerdown",function(ev){drag={x:ev.clientX,y:ev.clientY,moved:false};cv.setPointerCapture(ev.pointerId);});
+cv.addEventListener("pointermove",function(ev){
+  if(drag){
+    var dx=ev.clientX-drag.x, dy=ev.clientY-drag.y;
+    if(Math.abs(dx)+Math.abs(dy)>3) drag.moved=true;
+    if(mode==="inside"){ walkS.yaw-=dx*0.005; walkS.pitch=Math.max(-0.7,Math.min(0.7,walkS.pitch-dy*0.004)); }
+    else { orb.theta-=dx*0.006; orb.phi=Math.max(0.10,Math.min(Math.PI-0.10,orb.phi-dy*0.006)); }
+    drag.x=ev.clientX; drag.y=ev.clientY; place();
+  } else hover(ev);
+});
+cv.addEventListener("pointerup",function(ev){ if(drag&&!drag.moved) pick(ev); drag=null; });
+cv.addEventListener("pointerleave",function(){ tip.classList.remove("on"); });
+cv.addEventListener("wheel",function(ev){
+  if(mode==="inside") return;
+  ev.preventDefault();
+  orb.dist=Math.max(8,Math.min(95,orb.dist*(1+Math.sign(ev.deltaY)*0.11)));
+  place();
+},{passive:false});
+
+var ray=new THREE.Raycaster(), mouse=new THREE.Vector2();
+function castAt(ev){
+  var r=cv.getBoundingClientRect();
+  mouse.x=((ev.clientX-r.left)/r.width)*2-1;
+  mouse.y=-((ev.clientY-r.top)/r.height)*2+1;
+  ray.setFromCamera(mouse,camera);
+  return ray.intersectObjects(markers.filter(function(m){return m.visible;}));
+}
+function hover(ev){
+  var hit=castAt(ev);
+  if(hit.length){
+    var e=EQ.filter(function(x){return x.id===hit[0].object.userData.id;})[0];
+    var r=cv.getBoundingClientRect();
+    tip.style.left=(ev.clientX-r.left)+"px"; tip.style.top=(ev.clientY-r.top)+"px";
+    tip.innerHTML=e.name+"<i>"+SUBS[e.sub].name+"</i>";
+    tip.classList.add("on"); cv.style.cursor="pointer";
+  } else { tip.classList.remove("on"); cv.style.cursor = mode==="inside"?"move":"grab"; }
+}
+function pick(ev){ var h=castAt(ev); select(h.length?h[0].object.userData.id:null); }
+function select(id, keep){
+  selected=(!keep && selected===id)?null:id;
+  renderItems(); renderStrip(EQ.filter(function(e){return e.id===selected;})[0]);
+  var hb=document.getElementById("camcov"); if(hb) hb.style.opacity = (selected==="cam")?1:0.45;
+  var dark=currentDark();
+  markers.forEach(function(m){
+    var on=!selected||m.userData.id===selected;
+    if(m.userData.isBand){ m.userData.face.opacity = on?1:0.35; m.userData.face.emissiveIntensity = on?(dark?1.05:0.9):0.25; return; }
+    var s=SUBS[m.userData.sub], hx=dark?s.hexD:s.hex;
+    m.material.emissiveIntensity = on ? (selected?0.95:(dark?0.5:0.22)) : 0.02;
+    m.material.opacity = on?1:0.22;
+    m.material.color.setHex(hx);
+  });
+  syncCam();
+}
+function applyLayers(){
+  markers.forEach(function(m){ m.visible = active[m.userData.sub]; });
+  if(typeof syncCam==="function") syncCam();
+  if(selected && !active[EQ.filter(function(e){return e.id===selected;})[0].sub]) select(selected);
+}
+function setView(v){
+  mode=v;
+  var btns=document.querySelectorAll("[data-view]");
+  for(var i=0;i<btns.length;i++) btns[i].setAttribute("aria-pressed",String(btns[i].dataset.view===v));
+  document.getElementById("walkwrap").hidden=(v!=="inside");
+  var op = (v==="ext"||v==="wayside")?1.0:(v==="roof"?0.14:0.18);
+  bodies.forEach(function(b){ b.material.opacity=(v==="inside")?0.10:op; b.material.depthWrite=(v==="ext"||v==="wayside"); });
+  glassMat.opacity = (v==="ext"||v==="wayside")?0.55:0.22;
+  screenMat.opacity = (v==="inside") ? 0.30 : 0.93;
+  doorMat.opacity  = (v==="ext"||v==="wayside")?0.95:0.30;
+  interiors.forEach(function(g){
+    g.visible=(v!=="roof");
+    g.traverse(function(o){ if(o.material){ o.material.transparent=(v==="ext"||v==="wayside"); o.material.opacity=(v==="ext"||v==="wayside")?0.25:1; } });
+  });
+  noseGlass.forEach(function(m){ m.visible = (v!=="roof"); });
+  noseCaps.forEach(function(gp){ gp.visible = (v!=="inside"); });
+  inLight.intensity=(v==="inside")?0.85:0.0;
+  window.__wide = (v==="wayside");
+  if(scene.fog){
+    scene.fog.near = window.__wide ? (currentDark()?90:100) : window.__fogNear;
+    scene.fog.far  = window.__wide ? (currentDark()?300:330) : window.__fogFar;
+  }
+  if(typeof setLobes==="function") setLobes();
+  if(grid && grid.material) grid.material.opacity = window.__wide ? 0.24 : (currentDark()?0.75:0.6);
+  if(v==="wayside"){ orb.phi=0.34; orb.theta=0.10; orb.dist=104; target.set(0,0.4,0); }
+  else if(v==="roof"){ orb.phi=0.16; orb.theta=0; orb.dist=38; target.set(0,1.5,0); }
+  else if(v==="ext"){ orb.phi=1.17; orb.theta=-0.74; orb.dist=41; target.set(0,1.6,0); }
+  else if(v==="xray"){ orb.phi=1.10; orb.theta=-0.60; orb.dist=39; target.set(0,1.6,0); }
+  else { walkS.x=-18+(document.getElementById("walk").value/1000)*36; walkS.yaw=0; walkS.pitch=0; }
+  document.getElementById("hud").textContent = (v==="inside") ? "drag to look around · slider to move along the train"
+    : (v==="wayside") ? "each pole paints a cell · adjacent cells use different channels and overlap · pole spacing not to scale"
+    : "drag to orbit · scroll to zoom · click an item";
+  applyLayers(); syncCam(); place();
+}
+var vb=document.querySelectorAll("[data-view]");
+for(var vi=0;vi<vb.length;vi++) vb[vi].addEventListener("click",function(e){ setView(e.currentTarget.dataset.view); });
+document.getElementById("walk").addEventListener("input",function(e){ walkS.x=-18+(e.target.value/1000)*36; place(); });
+document.getElementById("turn").addEventListener("click",function(){ walkS.dir*=-1; place(); });
+var reduceM = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+var running = !reduceM, speed = 8;
+var runbtn=document.getElementById("runbtn");
+function syncRun(){
+  runbtn.setAttribute("aria-pressed",String(running));
+  runbtn.textContent = running ? "Train running" : "Train stopped";
+}
+runbtn.addEventListener("click", function(){ running=!running; syncRun(); });
+syncRun();
+document.getElementById("spd").addEventListener("input", function(e){ speed=+e.target.value; });
+
+document.getElementById("flowbtn").addEventListener("click",function(e){
+  var on=e.currentTarget.getAttribute("aria-pressed")!=="true";
+  e.currentTarget.setAttribute("aria-pressed",String(on));
+  flowGroup.visible=on;
+});
+
+var labels=CARN.map(function(n){ var d=document.createElement("div"); d.className="carlabel"; d.textContent="CAR "+n; viewEl.appendChild(d); return d; });
+var v3=new THREE.Vector3();
+function projectLabels(){
+  var r=cv.getBoundingClientRect();
+  labels.forEach(function(d,i){
+    if(mode==="inside"){ d.style.display="none"; return; }
+    v3.set(CARX[i],YB+H+1.0,0).project(camera);
+    if(v3.z>1){ d.style.display="none"; return; }
+    d.style.display="block";
+    d.style.left=((v3.x*0.5+0.5)*r.width)+"px";
+    d.style.top=((-v3.y*0.5+0.5)*r.height)+"px";
+  });
+}
+function resize(){
+  var w=viewEl.clientWidth||900;
+  var h=Math.max(470,Math.min(650,Math.round(w*0.57)));
+  viewEl.style.height=h+"px";
+  renderer.setSize(w,h,false);
+  camera.aspect=w/h; camera.updateProjectionMatrix();
+}
+var clock=new THREE.Clock();
+function loop(){
+  var dt=Math.min(clock.getDelta(),0.05);
+  if(running){
+    scenery.position.x -= speed*dt;
+    while(scenery.position.x <= -PITCH) scenery.position.x += PITCH;
+  }
+  updateNsg(dt);
+  pidsLong.offset.x -= dt*0.055; pidsEnd.offset.x -= dt*0.11;
+  animatePax(clock.elapsedTime);
+  pidsLongM.offset.x += dt*0.055; pidsEndM.offset.x += dt*0.11;
+  if(flowGroup.visible){
+    flows.forEach(function(f){
+      f.t+=dt*0.30; if(f.t>1) f.t-=1;
+      var n=f.pts.length-1, seg=Math.min(n-1,Math.floor(f.t*n)), lt=f.t*n-seg;
+      f.dot.position.lerpVectors(f.pts[seg],f.pts[seg+1],lt);
+    });
+  }
+  projectLabels(); renderer.render(scene,camera); requestAnimationFrame(loop);
+}
+window.addEventListener("resize",function(){ resize(); place(); });
+if(window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").addEventListener)
+  window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", syncTheme);
+resize(); syncTheme(); syncBearer(); setView("ext"); place(); loop();
+</script>

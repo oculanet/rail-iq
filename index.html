@@ -1,0 +1,163 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rail-IQ</title>
+<meta name="description" content="Rail-IQ — browser-based simulation workbench for railway, metro, LRT, tram, APM and high-speed rail systems.">
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/railiq.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Rail-IQ home"><span data-logo></span><b>Rail<span>-</span>IQ</b></a>
+    <nav class="navlinks" aria-label="Sections">
+      <a href="#simulators">Simulators</a>
+      <a href="#disciplines">Disciplines</a>
+      <a href="#platform">Platform</a>
+      <a href="#extend">Add a module</a>
+    </nav>
+    <span class="spacer"></span>
+    <button class="kbtn" data-palette-btn aria-label="Search simulators"><span data-icon="search"></span><span class="lbl">Search simulators…</span><kbd>Ctrl K</kbd></button>
+    <button class="iconbtn" data-theme-btn aria-label="Theme"></button>
+  </div>
+</header>
+
+<main>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-grid">
+      <div>
+        <span class="eyebrow"><span class="dot"></span>Railway systems simulation platform</span>
+        <h1>Simulate the <em>whole railway</em> before it is built.</h1>
+        <p class="lede">Rail-IQ brings traction power, telecom, signalling and operations simulators for metro, LRT, tram, APM and high-speed rail into one browser workbench. No install — open a model, load your alignment and train data, and get report-ready results.</p>
+        <div class="cta">
+          <a class="btn primary" href="#simulators"><span data-icon="grid"></span>Browse simulators</a>
+          <button class="btn" data-palette-btn><span data-icon="search"></span>Quick launch <kbd style="margin-left:4px">Ctrl K</kbd></button>
+        </div>
+        <div class="stats" role="list">
+          <div class="stat" role="listitem"><b data-stat="live">0</b><span>live simulators</span></div>
+          <div class="stat" role="listitem"><b data-stat="pipe">0</b><span>in the pipeline</span></div>
+          <div class="stat" role="listitem"><b data-stat="disc">0</b><span>engineering disciplines</span></div>
+          <div class="stat" role="listitem"><b data-stat="dom">0</b><span>railway domains</span></div>
+        </div>
+      </div>
+
+      <div class="netpanel" aria-label="Animated network schematic. Click a line to filter simulators by domain.">
+        <header>
+          <span class="t">Network view</span>
+          <span class="live"><i></i>Live</span>
+          <span class="tc"><span id="trains">0</span> trains in service</span>
+          <span class="sp"></span>
+          <span class="clock" id="clock">--:--:--</span>
+        </header>
+        <div style="position:relative;flex:1;display:flex">
+          <canvas id="net"></canvas>
+          <div class="nettip" id="nettip" hidden></div>
+        </div>
+        <div class="netlegend" id="netlegend" aria-label="Filter by domain"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DISCIPLINES -->
+  <section class="block" id="disciplines" style="padding-bottom:8px">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="sec-num">01 / DISCIPLINES</span><h2>Pick a discipline</h2></div>
+        <p>Each tile filters the catalogue below. The bar shows how much of that discipline is already live.</p>
+      </div>
+      <div class="disc" id="disc"></div>
+    </div>
+  </section>
+
+  <!-- CATALOGUE -->
+  <section class="block" id="simulators">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="sec-num">02 / SIMULATORS</span><h2>Simulator catalogue</h2></div>
+        <p>Launch opens the model inside the Rail-IQ workspace; Details shows scope, outputs, standards and files.</p>
+      </div>
+
+      <div class="recent" id="recent" hidden></div>
+
+      <div class="toolbar">
+        <label class="search"><span data-icon="search"></span><input id="q" type="search" placeholder="Search by name, standard, output…  ( / )" aria-label="Search simulators"></label>
+        <div class="seg" id="statseg" role="group" aria-label="Status">
+          <button data-status="all" aria-pressed="true">All</button>
+          <button data-status="live" aria-pressed="false">Live</button>
+          <button data-status="planned" aria-pressed="false">Pipeline</button>
+        </div>
+        <select id="sort" aria-label="Sort" style="height:32px;border:1px solid var(--line);border-radius:8px;background:var(--bg);padding:0 8px;font-size:13px">
+          <option value="status">Sort: live first</option>
+          <option value="name">Sort: name</option>
+          <option value="updated">Sort: recently updated</option>
+        </select>
+        <div class="chips" id="domchips" style="flex-basis:100%"></div>
+      </div>
+      <div class="resultline" id="resultline"></div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </section>
+
+  <!-- PLATFORM -->
+  <section class="block" id="platform" style="border-top:1px solid var(--line)">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="sec-num">03 / PLATFORM</span><h2>How Rail-IQ works</h2></div>
+      </div>
+      <div class="pillars">
+        <div class="pillar"><span class="n">A</span><h4>Runs in the browser</h4><p>Every simulator is a self-contained web page. Open it from disk, a shared drive or GitHub Pages — nothing to install.</p></div>
+        <div class="pillar"><span class="n">B</span><h4>Your project data in</h4><p>Load alignments from Excel and rolling-stock data from Word; every input stays editable and can be exported again.</p></div>
+        <div class="pillar"><span class="n">C</span><h4>Same engine in Python</h4><p>Where a model has a Python twin, the browser and command-line versions share one calculation and give the same numbers.</p></div>
+        <div class="pillar"><span class="n">D</span><h4>Report-ready results</h4><p>Charts, pass/fail checks and Word, PDF and Excel outputs ready for design submissions.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXTEND -->
+  <section class="block" id="extend" style="padding-top:8px">
+    <div class="wrap">
+      <div class="sec-head">
+        <div><span class="sec-num">04 / EXTEND</span><h2>Add a simulator</h2></div>
+        <p>Drop the simulator into <span class="mono">modules/&lt;id&gt;/</span> and register it in <span class="mono">assets/js/catalog.js</span>. The cards, filters, search, network view and workspace pick it up automatically.</p>
+      </div>
+<div class="code"><span class="c">// assets/js/catalog.js</span>
+{
+  id: <span class="s">"cbtc-headway"</span>,
+  title: <span class="s">"CBTC Headway &amp; Capacity"</span>,
+  domains: [<span class="s">"metro"</span>, <span class="s">"apm"</span>],
+  discipline: <span class="s">"signalling"</span>,
+  status: <span class="s">"live"</span>,                                 <span class="c">// live | beta | planned</span>
+  entry: <span class="s">"modules/cbtc-headway/index.html"</span>,
+  ...
+}</div>
+    </div>
+  </section>
+</main>
+
+<footer class="sitefoot">
+  <div class="wrap">
+    <a class="brand" href="index.html" aria-label="Rail-IQ home"><span data-logo style="display:inline-flex;width:22px;height:22px"></span></a>
+    <span>Rail-IQ · Railway systems simulation · © <span id="year"></span></span>
+    <span class="sp"></span>
+    <a href="#simulators">Simulators</a>
+    <a href="README.md">Documentation</a>
+    <span class="mono" style="font-size:12px">Press <kbd>Ctrl K</kbd> anywhere</span>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" hidden></aside>
+
+<script src="assets/js/catalog.js"></script>
+<script src="assets/js/common.js"></script>
+<script src="assets/js/network.js"></script>
+<script src="assets/js/home.js"></script>
+</body>
+</html>

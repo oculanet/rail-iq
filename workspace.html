@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Rail-IQ Workspace</title>
+<link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<link rel="stylesheet" href="assets/css/railiq.css">
+<style>
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;overflow:hidden}
+  .wsbar{display:flex;align-items:center;gap:10px;height:54px;padding:0 12px 0 14px;border-bottom:1px solid var(--line);background:var(--surface);flex:none}
+  .wsbar .brand b{font-size:21px}
+  .wsbar .sep{width:1px;height:26px;background:var(--line)}
+  .switch{position:relative}
+  .switch>button{display:flex;align-items:center;gap:10px;height:38px;padding:0 10px;border:1px solid transparent;border-radius:8px;background:transparent;cursor:pointer;max-width:46vw}
+  .switch>button:hover,.switch>button[aria-expanded="true"]{background:var(--surface-2);border-color:var(--line)}
+  .switch .ico{display:grid;place-items:center;width:28px;height:28px;border-radius:7px;background:var(--accent-soft);color:var(--accent);flex:none}
+  .switch .ico svg{width:16px;height:16px}
+  .switch .nm{font-family:var(--f-disp);font-size:19px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .switch .chev{width:16px;height:16px;color:var(--ink-3);flex:none}
+  .menu{position:absolute;top:calc(100% + 6px);left:0;width:min(400px,92vw);background:var(--surface);border:1px solid var(--line-2);border-radius:12px;box-shadow:var(--shadow);padding:6px;z-index:50}
+  .menu a{display:flex;gap:12px;align-items:center;padding:9px 10px;border-radius:8px;text-decoration:none}
+  .menu a:hover,.menu a[aria-current="true"]{background:var(--surface-2)}
+  .menu a .t{flex:1;min-width:0}
+  .menu a b{display:block;font-weight:500;font-size:14px}
+  .menu a small{display:block;color:var(--ink-3);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .menu .ft{border-top:1px solid var(--line);margin-top:6px;padding-top:6px}
+  .wsmeta{font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);white-space:nowrap}
+  .wsbar .sp{flex:1}
+  .stage{position:relative;flex:1;min-height:0;background:var(--bg)}
+  .stage iframe{position:absolute;inset:0;width:100%;height:100%;border:0;background:var(--bg)}
+  .loading{position:absolute;inset:0;display:grid;place-items:center;background:var(--bg);z-index:2;transition:opacity .3s}
+  .loading.done{opacity:0;pointer-events:none}
+  .loader{display:flex;flex-direction:column;align-items:center;gap:14px;font-family:var(--f-mono);font-size:12px;color:var(--ink-3)}
+  .track{position:relative;width:220px;height:6px;border-radius:3px;background:var(--surface-3);overflow:hidden}
+  .track i{position:absolute;top:0;left:-30%;width:30%;height:100%;border-radius:3px;background:var(--accent);animation:run 1.1s cubic-bezier(.5,0,.5,1) infinite}
+  @keyframes run{to{left:100%}}
+  .notfound{max-width:520px;margin:12vh auto;padding:0 16px;text-align:center}
+  .notfound h1{font-family:var(--f-disp);font-size:40px;margin:0 0 8px}
+  .notfound p{color:var(--ink-2)}
+  @media (max-width:760px){.wsmeta,.wsbar .brand b,.wsbar .sep,.hide-sm{display:none}}
+</style>
+</head>
+<body>
+
+<div class="wsbar">
+  <a class="brand" href="index.html" title="Rail-IQ home"><span data-logo></span><b>Rail<span>-</span>IQ</b></a>
+  <span class="sep"></span>
+  <div class="switch">
+    <button id="swbtn" aria-haspopup="true" aria-expanded="false"><span class="ico" id="swico"></span><span class="nm" id="swname">Loading…</span><span class="chev" data-icon="chev"></span></button>
+    <div class="menu" id="menu" hidden></div>
+  </div>
+  <span class="pill live" id="wsstatus" hidden></span>
+  <span class="wsmeta" id="wsmeta"></span>
+  <span class="sp"></span>
+  <a class="iconbtn hide-sm" id="details" title="Details" aria-label="Details"><span data-icon="info"></span></a>
+  <button class="iconbtn" id="reload" title="Reload simulator" aria-label="Reload simulator"><span data-icon="reload"></span></button>
+  <button class="iconbtn hide-sm" id="full" title="Full screen" aria-label="Full screen"><span data-icon="full"></span></button>
+  <a class="iconbtn" id="standalone" target="_blank" rel="noopener" title="Open standalone in a new tab" aria-label="Open standalone"><span data-icon="ext"></span></a>
+  <button class="iconbtn" data-palette-btn title="Search (Ctrl K)" aria-label="Search"><span data-icon="search"></span></button>
+  <button class="iconbtn" data-theme-btn aria-label="Theme"></button>
+</div>
+
+<div class="stage" id="stage">
+  <div class="loading" id="loading"><div class="loader"><div class="track"><i></i></div><span id="loadtxt">Loading simulator…</span></div></div>
+</div>
+
+<script src="assets/js/catalog.js"></script>
+<script src="assets/js/common.js"></script>
+<script>
+(function () {
+  "use strict";
+  const R = window.RailIQ, DIS = window.RAILIQ_DISCIPLINES;
+  const $ = s => document.querySelector(s);
+  const id = new URLSearchParams(location.search).get("m");
+  const m = R.byId(id);
+
+  document.addEventListener("DOMContentLoaded", () => {
+    R.mountPalette({});
+    buildMenu();
+
+    if (!R.isOpenable(m)) {
+      $("#swname").textContent = "Simulator not found";
+      $("#swico").innerHTML = R.icon("info");
+      $("#stage").innerHTML = '<div class="notfound"><h1>No simulator here</h1><p>' +
+        (m ? "“" + R.esc(m.title) + "” is in the Rail-IQ pipeline and is not available yet." : "There is no simulator with the id “" + R.esc(id || "") + "”.") +
+        '</p><p><a class="btn primary" href="index.html#simulators">Back to the catalogue</a></p></div>';
+      ["#details", "#reload", "#full", "#standalone"].forEach(s => ($(s).hidden = true));
+      return;
+    }
+
+    const d = DIS[m.discipline] || { icon: "grid", label: "" };
+    document.title = m.title + " · Rail-IQ";
+    $("#swname").textContent = m.title;
+    $("#swico").innerHTML = R.icon(d.icon);
+    const st = $("#wsstatus"); st.hidden = false; st.className = "pill " + m.status; st.textContent = m.status;
+    $("#wsmeta").textContent = [d.label, m.version].filter(Boolean).join(" · ");
+    $("#details").href = "index.html#m=" + encodeURIComponent(m.id);
+    $("#standalone").href = m.entry;
+    $("#loadtxt").textContent = "Loading " + m.title + "…";
+
+    const fr = document.createElement("iframe");
+    fr.title = m.title;
+    fr.src = m.entry;
+    fr.setAttribute("allow", "fullscreen; clipboard-read; clipboard-write");
+    fr.addEventListener("load", () => { $("#loading").classList.add("done"); syncTheme(); });
+    $("#stage").appendChild(fr);
+    R.pushRecent(m.id);
+
+    // Pass the portal theme into the simulator when the browser allows it (same origin, e.g. served over http).
+    function syncTheme() {
+      try {
+        const t = R.store.get("theme", "auto"), root = fr.contentDocument && fr.contentDocument.documentElement;
+        if (!root) return;
+        if (t === "auto") root.removeAttribute("data-theme"); else root.setAttribute("data-theme", t);
+      } catch (e) { /* cross-origin (file://): the simulator keeps its own theme */ }
+    }
+    document.addEventListener("railiq:theme", syncTheme);
+
+    $("#reload").onclick = () => { $("#loading").classList.remove("done"); fr.src = m.entry; };
+    $("#full").onclick = () => { const s = $("#stage"); (s.requestFullscreen || s.webkitRequestFullscreen || function () {}).call(s); };
+  });
+
+  function buildMenu() {
+    const btn = $("#swbtn"), menu = $("#menu");
+    const live = (window.RAILIQ_CATALOG || []).filter(R.isOpenable);
+    menu.innerHTML = live.map(x =>
+      '<a href="' + R.launchUrl(x) + '" aria-current="' + (m && x.id === m.id) + '"><span class="ico" style="display:grid;place-items:center;width:28px;height:28px;border-radius:7px;background:var(--accent-soft);color:var(--accent)">' +
+      R.icon((DIS[x.discipline] || {}).icon, 'width="16" height="16"') + '</span><span class="t"><b>' + R.esc(x.title) + "</b><small>" + R.esc(x.summary) + "</small></span></a>").join("") +
+      '<div class="ft"><a href="index.html#simulators"><span class="ico" style="display:grid;place-items:center;width:28px;height:28px">' + R.icon("grid", 'width="16" height="16"') +
+      '</span><span class="t"><b>All simulators</b><small>Back to the Rail-IQ catalogue</small></span></a></div>';
+    const set = o => { menu.hidden = !o; btn.setAttribute("aria-expanded", o); };
+    btn.addEventListener("click", e => { e.stopPropagation(); set(menu.hidden); });
+    document.addEventListener("click", e => { if (!menu.contains(e.target)) set(false); });
+    document.addEventListener("keydown", e => { if (e.key === "Escape") set(false); });
+  }
+})();
+</script>
+</body>
+</html>
