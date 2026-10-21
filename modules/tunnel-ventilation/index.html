@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tunnel Ventilation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#ECEEE9; --panel:#FAFAF7; --panel-2:#E3E6DF; --input:#FFFFFF;
+  --ink:#121820; --ink-2:#44505A; --ink-3:#77828B; --line:#D2D6CD; --line-2:#B5BAB0;
+  --accent:#D2480F; --accent-soft:#F8E1D4;
+  --pass:#1E7A4A; --pass-soft:#DAF0E2; --fail:#B3261E; --fail-soft:#F8DEDB; --warn:#9A6200; --warn-soft:#F6EAD1;
+  --air:#1F6FB2; --air-soft:#D6E6F5; --src:#1F6FB2; --loss:#C2410C; --fire:#D9480F; --smoke:#7A7F86; --grid:#E2E5DD;
+  --tunnel:#C9CDC4; --rock:#DCDFD7;
+  --f-disp:"Saira Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0F13; --panel:#12181E; --panel-2:#18212A; --input:#0E1419;
+  --ink:#E8EDF1; --ink-2:#A6B1BB; --ink-3:#717D88; --line:#222C35; --line-2:#33404C;
+  --accent:#FF7A33; --accent-soft:#3A1F10;
+  --pass:#4FCB86; --pass-soft:#11291C; --fail:#F2756C; --fail-soft:#3B1C1A; --warn:#E5AE4A; --warn-soft:#30240F;
+  --air:#4FA3EC; --air-soft:#14283B; --src:#4FA3EC; --loss:#FF8A4C; --fire:#FF7A33; --smoke:#8A929A; --grid:#1D252D;
+  --tunnel:#2A333C; --rock:#1A2229;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0F13; --panel:#12181E; --panel-2:#18212A; --input:#0E1419;
+  --ink:#E8EDF1; --ink-2:#A6B1BB; --ink-3:#717D88; --line:#222C35; --line-2:#33404C;
+  --accent:#FF7A33; --accent-soft:#3A1F10;
+  --pass:#4FCB86; --pass-soft:#11291C; --fail:#F2756C; --fail-soft:#3B1C1A; --warn:#E5AE4A; --warn-soft:#30240F;
+  --air:#4FA3EC; --air-soft:#14283B; --src:#4FA3EC; --loss:#FF8A4C; --fire:#FF7A33; --smoke:#8A929A; --grid:#1D252D;
+  --tunnel:#2A333C; --rock:#1A2229;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:56px}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,select{font:inherit;color:inherit}
+.sheet{max-width:1480px;margin:0 auto;padding:16px 16px 60px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-disp);margin:0;letter-spacing:.01em}
+.mono{font-family:var(--f-mono)} .muted{color:var(--ink-3)}
+.tb{display:grid;grid-template-columns:2.2fr 1.3fr 1fr 1.1fr 1.1fr;border:1.5px solid var(--ink);background:var(--panel)}
+.tb>div{padding:10px 12px;border-left:1px solid var(--line-2);min-width:0}
+.tb>div:first-child{border-left:0}
+.tb label{display:block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.tb input{width:100%;border:0;border-bottom:1px dashed var(--line-2);background:transparent;padding:2px 0;font-weight:600}
+.tb input.big{font-family:var(--f-disp);font-size:24px;font-weight:600}
+.tb .res{font-family:var(--f-disp);font-size:22px;font-weight:600}
+@media (max-width:900px){.tb{grid-template-columns:1fr 1fr}.tb>div{border-left:0;border-top:1px solid var(--line-2)}.tb>div:first-child{grid-column:1/-1;border-top:0}}
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid var(--line-2);border-radius:7px;background:var(--panel);cursor:pointer;font-size:13.5px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.sm{height:28px;padding:0 9px;font-size:12.5px}
+.btn.icon{width:28px;padding:0;justify-content:center;color:var(--ink-3)}
+.btn.icon:hover{color:var(--fail);border-color:var(--fail)}
+.actions .sp{flex:1}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2)}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--pass)}
+.status.bad i{background:var(--fail)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px}
+.panel>header{display:flex;flex-wrap:wrap;align-items:center;gap:6px 16px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.panel>header h2{font-size:22px;font-weight:600}
+.panel>header .note{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-left:auto}
+.panel .body{padding:14px 16px}
+.tabs{display:flex;gap:2px;padding:0 8px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{border:0;background:none;padding:10px 12px;cursor:pointer;color:var(--ink-2);border-bottom:2.5px solid transparent;font-weight:500;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .cnt{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-left:4px}
+.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px 18px}
+.fld label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:4px}
+.fld input,.fld select{width:100%;height:34px;border:1px solid var(--line-2);border-radius:6px;background:var(--input);padding:0 9px}
+.fld input[type=checkbox]{width:auto;height:auto}
+.fld small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:3px}
+.fld .unit{position:relative}
+.fld .unit input{padding-right:46px}
+.fld .unit span{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);pointer-events:none}
+.fld .calc{font-family:var(--f-mono);font-size:15px;padding-top:7px}
+.fgroup{margin-top:20px}
+.fgroup:first-child{margin-top:0}
+.fgroup h3{font-size:16px;font-weight:600;margin-bottom:10px;color:var(--ink-2)}
+input:focus,select:focus{outline:2px solid var(--accent);outline-offset:-1px}
+input.bad{border-color:var(--fail)!important;background:var(--fail-soft)!important}
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);font-weight:500;text-align:left;padding:7px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap}
+td{padding:5px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.num{font-family:var(--f-mono);font-size:12.5px}
+table.edit td{padding:3px 4px}
+table.edit input[type=text],table.edit input[type=number],table.edit select{width:100%;min-width:56px;height:30px;border:1px solid transparent;border-radius:5px;background:transparent;padding:0 6px}
+table.edit input:hover,table.edit select:hover{border-color:var(--line-2)}
+table.edit input:focus{background:var(--input)}
+table.edit input[type=number]{text-align:right;font-family:var(--f-mono);font-size:12.5px}
+tr.sel td{background:var(--accent-soft)}
+tr.click{cursor:pointer}
+tr.click:hover td{background:var(--panel-2)}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill.pass{background:var(--pass-soft);color:var(--pass)} .pill.fail{background:var(--fail-soft);color:var(--fail)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.na{background:var(--panel-2);color:var(--ink-3)}
+.toolrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:16px 0 8px}
+.jump{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:8px 2px;background:var(--bg);font-size:13px}
+.jump b{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--ink-3);font-weight:500}
+.jump a{color:var(--ink-2);text-decoration:none;border-bottom:1px dotted var(--line-2)}
+.jump a:hover{color:var(--accent)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+.kpi{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--panel)}
+.kpi .l{font-size:12px;color:var(--ink-3)}
+.kpi .v{font-family:var(--f-disp);font-size:32px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .v small{font-size:16px}
+.kpi .s{font-size:12px;color:var(--ink-2);margin-top:4px}
+.kpi.pass{border-color:var(--pass)} .kpi.fail{border-color:var(--fail)}
+.chart{width:100%;display:block}
+.chart text{font-family:var(--f-mono);font-size:11px;fill:var(--ink-2)}
+.chart .lbl{font-family:var(--f-body);font-size:12px;fill:var(--ink)}
+.chart .gr{stroke:var(--grid)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px}
+@media (max-width:1000px){.two{grid-template-columns:1fr}}
+.selbar select{height:32px;border:1px solid var(--line-2);border-radius:6px;background:var(--input);padding:0 8px;max-width:420px}
+.combo td{text-align:center;font-family:var(--f-mono);font-size:12px;padding:6px 4px;border:1px solid var(--line)}
+.combo td.ok{background:var(--pass-soft);color:var(--pass);font-weight:600}
+.combo td.no{background:var(--fail-soft);color:var(--fail)}
+.combo td.best{outline:2.5px solid var(--ink);outline-offset:-3px}
+.combo th{text-align:center}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--ink-2);margin-top:6px}.legend i{display:inline-block;width:14px;height:3px;vertical-align:middle;margin-right:6px}
+.method p,.method li{color:var(--ink-2);max-width:95ch}
+.method h3{font-size:17px;margin:16px 0 4px}
+.method code{font-family:var(--f-mono);font-size:12.5px;background:var(--panel-2);padding:1px 5px;border-radius:3px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:13.5px;z-index:50}
+.callout{border-left:0;background:var(--panel-2);border-radius:6px;padding:10px 14px;font-size:13.5px;color:var(--ink-2)}
+.callout b{color:var(--ink)}
+@media print{
+  @page{size:A4 landscape;margin:12mm}
+  body{background:#fff;color:#000;font-size:11px}
+  .actions,.jump,#inputs,.btn,.selbar{display:none!important}
+  .panel{border:0;break-inside:avoid-page}
+  .panel>header{padding:6px 0;border-bottom:1.5px solid #000}
+  .panel .body{padding:8px 0}
+  .sheet{padding:0;gap:10px}
+  .tw{overflow:visible}
+  #r-verify,#r-method{break-before:page}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="tb">
+    <div><label for="p-name">Project</label><input class="big" id="p-name" data-k="project.name"></div>
+    <div><label for="p-sys">Tunnel</label><input id="p-sys" data-k="project.system"></div>
+    <div><label for="p-doc">Document ref.</label><input id="p-doc" data-k="project.docRef"></div>
+    <div><label>Model</label><div style="font-weight:600;padding-top:3px">Tunnel ventilation Phase 1 <span class="pill warn">beta</span></div></div>
+    <div><label>Fire scenarios</label><div class="res" id="tb-result">—</div></div>
+  </header>
+
+  <div class="actions">
+    <button class="btn primary" id="b-export">Export results (Excel)</button>
+    <button class="btn" id="b-json">Save inputs (JSON)</button>
+    <button class="btn" id="b-jsonin">Open inputs (JSON)</button>
+    <button class="btn" id="b-print">Print / PDF report</button>
+    <button class="btn" id="b-sample">Reset to sample</button>
+    <span class="sp"></span>
+    <span class="status" id="status"><i></i><span>Ready</span></span>
+    <input type="file" id="f-json" accept=".json" hidden>
+  </div>
+
+  <section class="panel" id="inputs">
+    <header><h2>Input data</h2><span class="note">All values editable · saved in this browser · results update as you type · positive direction = end A → end B</span></header>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="t-tunnel" aria-selected="true">Tunnel & air</button>
+      <button class="tab" role="tab" data-tab="t-equip" aria-selected="false">Train & fans</button>
+      <button class="tab" role="tab" data-tab="t-fire" aria-selected="false">Fire & scenarios <span class="cnt" id="cnt-sc"></span></button>
+    </div>
+
+    <div class="body" id="t-tunnel" role="tabpanel">
+      <div class="fgroup"><h3>Tunnel section</h3><div class="form">
+        <div class="fld"><label>Length A → B</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.length"><span>m</span></div></div>
+        <div class="fld"><label>Cross-section area</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.area"><span>m²</span></div></div>
+        <div class="fld"><label>Wetted perimeter</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.perimeter"><span>m</span></div></div>
+        <div class="fld"><label>Tunnel height (for critical velocity)</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.height"><span>m</span></div></div>
+        <div class="fld"><label>Gradient (B above A is +)</label><div class="unit"><input type="number" step="any" data-k="tunnel.grade"><span>%</span></div></div>
+        <div class="fld"><label>Hydraulic diameter</label><div class="calc" id="c-dh">—</div><small>4 × area / perimeter</small></div>
+      </div></div>
+      <div class="fgroup"><h3>Losses</h3><div class="form">
+        <div class="fld"><label>Darcy friction factor λ</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.lambda"><span>–</span></div><small>lined tunnel typically 0.02 – 0.03</small></div>
+        <div class="fld"><label>Entry loss ζ</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.zIn"><span>–</span></div></div>
+        <div class="fld"><label>Exit loss ζ</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.zOut"><span>–</span></div></div>
+        <div class="fld"><label>Other local losses Σζ</label><div class="unit"><input type="number" step="any" min="0" data-k="tunnel.zOther"><span>–</span></div><small>bends, cross-sections, equipment</small></div>
+        <div class="fld"><label>Total tunnel resistance K</label><div class="calc" id="c-k">—</div><small>λL/Dh + Σζ</small></div>
+      </div></div>
+      <div class="fgroup"><h3>Air</h3><div class="form">
+        <div class="fld"><label>Air density</label><div class="unit"><input type="number" step="any" min="0" data-k="air.rho"><span>kg/m³</span></div></div>
+        <div class="fld"><label>Ambient temperature</label><div class="unit"><input type="number" step="any" data-k="air.tempC"><span>°C</span></div></div>
+      </div></div>
+    </div>
+
+    <div class="body" id="t-equip" role="tabpanel" hidden>
+      <div class="fgroup"><h3>Stalled train (used where a scenario has a train in the tunnel)</h3><div class="form">
+        <div class="fld"><label>Train length</label><div class="unit"><input type="number" step="any" min="0" data-k="train.length"><span>m</span></div></div>
+        <div class="fld"><label>Train frontal area</label><div class="unit"><input type="number" step="any" min="0" data-k="train.area"><span>m²</span></div></div>
+        <div class="fld"><label>Train perimeter</label><div class="unit"><input type="number" step="any" min="0" data-k="train.perimeter"><span>m</span></div></div>
+        <div class="fld"><label>Annulus friction factor λ</label><div class="unit"><input type="number" step="any" min="0" data-k="train.lambda"><span>–</span></div></div>
+        <div class="fld"><label>Blockage ratio</label><div class="calc" id="c-block">—</div><small>train area / tunnel area</small></div>
+      </div></div>
+      <div class="fgroup"><h3>Jet fans (in the tunnel)</h3><div class="form">
+        <div class="fld"><label>Installed</label><div class="unit"><input type="number" step="1" min="0" data-k="jet.installed"><span>no.</span></div></div>
+        <div class="fld"><label>Rated thrust per fan</label><div class="unit"><input type="number" step="any" min="0" data-k="jet.thrust"><span>N</span></div></div>
+        <div class="fld"><label>Outlet velocity</label><div class="unit"><input type="number" step="any" min="0" data-k="jet.vj"><span>m/s</span></div></div>
+        <div class="fld"><label>Installation efficiency</label><div class="unit"><input type="number" step="any" min="0" max="1" data-k="jet.eta"><span>–</span></div><small>wall / niche effect, typically 0.7 – 0.9</small></div>
+      </div></div>
+      <div class="two">
+        <div class="fgroup"><h3>End A fan plant (pushes air A → B)</h3><div class="form">
+          <div class="fld" style="grid-column:1/-1"><label>Name</label><input type="text" data-k="plantA.name"></div>
+          <div class="fld"><label>Fans installed</label><div class="unit"><input type="number" step="1" min="0" data-k="plantA.installed"><span>no.</span></div></div>
+          <div class="fld"><label>Rated flow per fan</label><div class="unit"><input type="number" step="any" min="0" data-k="plantA.qRated"><span>m³/s</span></div></div>
+          <div class="fld"><label>Pressure at rated flow</label><div class="unit"><input type="number" step="any" min="0" data-k="plantA.pRated"><span>Pa</span></div></div>
+          <div class="fld"><label>Shut-off pressure</label><div class="unit"><input type="number" step="any" min="0" data-k="plantA.p0"><span>Pa</span></div></div>
+          <div class="fld"><label>Shaft & damper loss</label><div class="unit"><input type="number" step="any" min="0" data-k="plantA.shaftLoss"><span>Pa</span></div><small>at full plant flow</small></div>
+        </div></div>
+        <div class="fgroup"><h3>End B fan plant (pulls air A → B)</h3><div class="form">
+          <div class="fld" style="grid-column:1/-1"><label>Name</label><input type="text" data-k="plantB.name"></div>
+          <div class="fld"><label>Fans installed</label><div class="unit"><input type="number" step="1" min="0" data-k="plantB.installed"><span>no.</span></div></div>
+          <div class="fld"><label>Rated flow per fan</label><div class="unit"><input type="number" step="any" min="0" data-k="plantB.qRated"><span>m³/s</span></div></div>
+          <div class="fld"><label>Pressure at rated flow</label><div class="unit"><input type="number" step="any" min="0" data-k="plantB.pRated"><span>Pa</span></div></div>
+          <div class="fld"><label>Shut-off pressure</label><div class="unit"><input type="number" step="any" min="0" data-k="plantB.p0"><span>Pa</span></div></div>
+          <div class="fld"><label>Shaft & damper loss</label><div class="unit"><input type="number" step="any" min="0" data-k="plantB.shaftLoss"><span>Pa</span></div><small>at full plant flow</small></div>
+        </div></div>
+      </div>
+    </div>
+
+    <div class="body" id="t-fire" role="tabpanel" hidden>
+      <div class="fgroup"><h3>Fire criteria</h3><div class="form">
+        <div class="fld"><label>Critical velocity method</label><select data-k="fire.method"><option value="kennedy">Kennedy (NFPA 502 / 130)</option><option value="li">Li, Lei & Ingason (2010)</option><option value="max">Higher of the two</option></select></div>
+        <div class="fld"><label>Design margin on critical velocity</label><div class="unit"><input type="number" step="any" min="0" data-k="fire.margin"><span>%</span></div></div>
+        <div class="fld"><label>Convective fraction of HRR</label><div class="unit"><input type="number" step="any" min="0" max="1" data-k="fire.convective"><span>–</span></div><small>for smoke temperature and buoyancy</small></div>
+        <div class="fld"><label>Fire buoyancy on the gradient</label><label style="display:flex;gap:8px;align-items:center;height:34px"><input type="checkbox" data-k="fire.buoyancy"> include stack effect of hot smoke</label></div>
+        <div class="fld"><label>Minimum velocity, congested train</label><div class="unit"><input type="number" step="any" min="0" data-k="fire.congestedMin"><span>m/s</span></div><small>0 = no check for no-fire scenarios</small></div>
+      </div></div>
+      <div class="toolrow"><h3 style="font-size:16px;color:var(--ink-2);margin-right:8px">Scenarios</h3><button class="btn sm" id="b-addsc">+ Add scenario</button><span class="muted" style="font-size:12.5px">Number of fans running in each scenario; failed or fire-damaged fans are simply not counted. HRR 0 = no fire.</span></div>
+      <div class="tw"><table class="edit" id="sctable"></table></div>
+    </div>
+  </section>
+
+  <nav class="jump" aria-label="Results">
+    <b>RESULTS</b>
+    <a href="#r-scen">Scenarios</a><a href="#r-detail">Selected scenario</a><a href="#r-curves">Pressures & fan curves</a><a href="#r-fire">Fire size</a><a href="#r-size">Fan sizing</a><a href="#r-verify">Verification</a><a href="#r-method">Method</a>
+  </nav>
+
+  <section class="panel" id="r-scen"><header><h2>Scenario results</h2><span class="note">Click a row to see it in detail</span></header><div class="body tw" id="scres"></div></section>
+
+  <section class="panel" id="r-detail"><header><h2>Selected scenario</h2><span class="selbar"><select id="selsc" aria-label="Selected scenario"></select></span><span class="note" id="det-note"></span></header>
+    <div class="body"><div class="kpis" id="kpis"></div><div style="margin-top:16px"><svg class="chart" id="schem" role="img" aria-label="Tunnel schematic"></svg></div></div></section>
+
+  <section class="panel" id="r-curves"><header><h2>Pressure balance & fan curves</h2><span class="note">At the operating point of the selected scenario</span></header>
+    <div class="body two"><div><h3 style="font-size:15px;margin-bottom:6px">Pressure balance (Pa)</h3><svg class="chart" id="pbal" role="img" aria-label="Pressure sources and losses"></svg></div>
+    <div><h3 style="font-size:15px;margin-bottom:6px">End fan plants against the tunnel</h3><svg class="chart" id="fancurve" role="img" aria-label="Fan plant curve and tunnel requirement"></svg><div class="legend" id="fan-legend"></div></div></div></section>
+
+  <section class="panel" id="r-fire"><header><h2>Fire size the ventilation can control</h2><span class="note" id="fire-note"></span></header>
+    <div class="body"><div class="callout" id="fire-call"></div><svg class="chart" id="firechart" style="margin-top:12px" role="img" aria-label="Critical velocity and achieved velocity against fire size"></svg></div></section>
+
+  <section class="panel" id="r-size"><header><h2>Fan sizing</h2><span class="note" id="size-note"></span></header>
+    <div class="body"><div class="callout" id="size-call"></div><div class="two" style="margin-top:14px"><div class="tw" id="size-jet"></div><div class="tw" id="size-plant"></div></div></div></section>
+
+  <section class="panel" id="r-verify"><header><h2>Verification</h2><span class="note" id="ver-note"></span></header><div class="body tw" id="verify"></div></section>
+
+  <section class="panel method" id="r-method"><header><h2>Method & assumptions</h2></header><div class="body">
+    <p>Phase 1 model: steady, one-dimensional longitudinal ventilation of a single tunnel bore between end A (chainage 0) and end B. Positive velocity is from A to B. The solver finds the air velocity <code>v</code> at which the pressure sources balance the losses.</p>
+    <h3>Pressure terms</h3>
+    <ul>
+      <li>Tunnel: <code>ΔP = (λ L / Dh + ζin + ζout + Σζ) · ρ/2 · v|v|</code>, <code>Dh = 4A / P</code>.</li>
+      <li>Stalled train: flow through the annulus <code>Aa = A − At</code> at <code>va = v A / Aa</code>, friction on <code>Da = 4Aa / (P + Pt)</code>, contraction <code>0.5 r</code> and Borda–Carnot expansion <code>r²</code> with <code>r = 1 − Aa/A</code>; the plain-tunnel friction over the train length is removed so it is not counted twice.</li>
+      <li>Jet fans: <code>ΔP = n · η · T / A · (1 − v / vj)</code> with rated thrust <code>T</code>.</li>
+      <li>End fan plant: <code>n</code> identical fans in parallel on a quadratic curve through the shut-off pressure and the rated point, minus the shaft & damper loss <code>∝ Q²</code>. A plant with no fans running adds nothing (dampers assumed to leave the portal open).</li>
+      <li>Portal pressure: wind or barometric difference between the ends, positive pushing A → B.</li>
+      <li>Fire buoyancy: <code>(ρ0 − ρf) g s Ld</code> over the hot length <code>Ld</code> from the fire to the downstream end, with the bulk smoke temperature <code>Tf = T0 + χ Q / (ρ0 cp A v)</code>.</li>
+    </ul>
+    <h3>Critical velocity</h3>
+    <ul>
+      <li>Kennedy (NFPA 502 Annex D, NFPA 130): <code>Vc = Kg · 0.61 · (g H Q / (ρ cp A Tf))^(1/3)</code>, <code>Tf = Q / (ρ cp A Vc) + T0</code>, iterated; <code>Kg = 1 + 0.0374 · grade^0.8</code> when the smoke flows downhill (grade in %).</li>
+      <li>Li, Lei & Ingason (2010): <code>Q* = Q / (ρ cp T0 g^½ H^2.5)</code>; <code>V* = 0.81 Q*^(1/3)</code> for <code>Q* ≤ 0.15</code>, otherwise <code>0.43</code>; <code>Vc = V* (gH)^½</code>.</li>
+      <li>A fire scenario passes when the velocity is in the required smoke direction and at least <code>Vc × (1 + margin)</code>.</li>
+    </ul>
+    <h3>Not in Phase 1</h3>
+    <p>Moving trains and piston effect, transient fire growth and smoke spread, multiple bores, cross-passages, shafts along the tunnel, station and platform smoke control, fire throttling (extra resistance of hot gas), backlayering length and tenability (temperature, visibility). These need a network/transient model such as SES or a CFD study; this Phase 1 tool is for early sizing and checks, to be reviewed by a tunnel ventilation engineer.</p>
+  </div></section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="tv_engine.js"></script>
+<script src="tv_tests.js"></script>
+<script src="tv_sample.js"></script>
+<script src="tv_app.js"></script>
+</body>
+</html>

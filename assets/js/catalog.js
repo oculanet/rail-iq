@@ -186,14 +186,27 @@ window.RAILIQ_CATALOG = [
   {
     id: "tunnel-ventilation",
     title: "Tunnel Ventilation",
-    summary: "1D airflow and smoke control for running tunnels during congestion and fire.",
-    description: "One-dimensional network model for tunnel airflow — piston effect, jet fans and shaft fans — to check critical velocity under fire scenarios.",
-    domains: ["metro", "mainline", "hsr"],
+    summary: "Tunnel airflow from jet fans and station fan plants, critical velocity for train fires, fan sizing and the largest controllable fire.",
+    description: "Phase 1 longitudinal ventilation model of one tunnel bore. Solves the steady pressure balance of jet fans, end fan plants on their fan curves (with shaft and damper losses), portal pressure and fire buoyancy against tunnel friction, local losses and a stalled train's annulus. Checks each scenario against the critical velocity (Kennedy / NFPA 502 or Li & Ingason) with a design margin, sizes jet fans and end fan combinations, and finds the largest fire the fans can control. Beta: for early sizing and checks; not a replacement for SES or CFD.",
+    domains: ["metro", "lrt", "mainline", "hsr", "apm"],
     discipline: "stations",
-    status: "planned",
-    standards: ["NFPA 130", "PIARC"],
-    features: ["Piston-effect airflow", "Critical velocity", "Fan sizing"],
-    outputs: ["Air velocity profile", "Fan duty"]
+    status: "beta",
+    entry: "modules/tunnel-ventilation/index.html",
+    version: "Phase 1 (beta)",
+    updated: "2026-10-21",
+    standards: ["NFPA 130", "NFPA 502", "PIARC"],
+    features: [
+      "Steady 1D pressure balance: tunnel friction, entry/exit and local losses, stalled-train annulus",
+      "Jet fans with installation efficiency; end fan plants on fan curves with shaft & damper loss",
+      "Portal (wind) pressure and fire buoyancy on the gradient",
+      "Critical velocity: Kennedy (NFPA 502 / 130) with grade factor, or Li & Ingason",
+      "Scenario table with fan failures, required smoke direction and design margin",
+      "Fan sizing: minimum jet fans and end-fan combinations for a fire scenario",
+      "Largest fire the selected fans can control",
+      "Verification tab: solver checked against closed-form solutions and a second root finder"
+    ],
+    outputs: ["Scenario pass/fail table", "Tunnel schematic", "Pressure balance", "Fan and tunnel curves", "Fire-size chart", "Sizing tables", "Excel workbook", "PDF report"],
+    resources: []
   },
   {
     id: "rams",
