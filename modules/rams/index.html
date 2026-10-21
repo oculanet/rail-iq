@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>RAMS & Availability</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Saira+Condensed:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
+<style>
+:root{
+  --bg:#ECEEE9; --panel:#FAFAF7; --panel-2:#E3E6DF; --input:#FFFFFF;
+  --ink:#121820; --ink-2:#44505A; --ink-3:#77828B; --line:#D2D6CD; --line-2:#B5BAB0;
+  --accent:#D2480F; --accent-soft:#F8E1D4;
+  --pass:#1E7A4A; --pass-soft:#DAF0E2; --fail:#B3261E; --fail-soft:#F8DEDB; --warn:#9A6200; --warn-soft:#F6EAD1;
+  --bar:#1F6FB2; --bar-2:#9DB9D6; --grid:#E2E5DD;
+  --heat0:#F1F2EF; --heat1:#F6E3B8; --heat2:#F0B98A; --heat3:#E07A5A; --heat4:#B3261E;
+  --f-disp:"Saira Condensed","Arial Narrow",Arial,sans-serif;
+  --f-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0B0F13; --panel:#12181E; --panel-2:#18212A; --input:#0E1419;
+  --ink:#E8EDF1; --ink-2:#A6B1BB; --ink-3:#717D88; --line:#222C35; --line-2:#33404C;
+  --accent:#FF7A33; --accent-soft:#3A1F10;
+  --pass:#4FCB86; --pass-soft:#11291C; --fail:#F2756C; --fail-soft:#3B1C1A; --warn:#E5AE4A; --warn-soft:#30240F;
+  --bar:#4FA3EC; --bar-2:#2B4C6B; --grid:#1D252D;
+  --heat0:#18212A; --heat1:#3A3214; --heat2:#5A3518; --heat3:#7A2E1E; --heat4:#A3271F;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0B0F13; --panel:#12181E; --panel-2:#18212A; --input:#0E1419;
+  --ink:#E8EDF1; --ink-2:#A6B1BB; --ink-3:#717D88; --line:#222C35; --line-2:#33404C;
+  --accent:#FF7A33; --accent-soft:#3A1F10;
+  --pass:#4FCB86; --pass-soft:#11291C; --fail:#F2756C; --fail-soft:#3B1C1A; --warn:#E5AE4A; --warn-soft:#30240F;
+  --bar:#4FA3EC; --bar-2:#2B4C6B; --grid:#1D252D;
+  --heat0:#18212A; --heat1:#3A3214; --heat2:#5A3518; --heat3:#7A2E1E; --heat4:#A3271F;
+  color-scheme:dark}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html{scroll-behavior:smooth;scroll-padding-top:56px}
+body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.5 var(--f-body);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+.sheet{max-width:1480px;margin:0 auto;padding:16px 16px 60px;display:flex;flex-direction:column;gap:16px}
+h1,h2,h3{font-family:var(--f-disp);margin:0;letter-spacing:.01em}
+.mono{font-family:var(--f-mono)}
+.muted{color:var(--ink-3)}
+
+/* title block */
+.tb{display:grid;grid-template-columns:2.2fr 1fr 1fr 1fr 1.1fr;border:1.5px solid var(--ink);background:var(--panel)}
+.tb>div{padding:10px 12px;border-left:1px solid var(--line-2);min-width:0}
+.tb>div:first-child{border-left:0}
+.tb label{display:block;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.tb input{width:100%;border:0;border-bottom:1px dashed var(--line-2);background:transparent;padding:2px 0;font-weight:600}
+.tb input.big{font-family:var(--f-disp);font-size:24px;font-weight:600}
+.tb .res{font-family:var(--f-disp);font-size:22px;font-weight:600}
+@media (max-width:900px){.tb{grid-template-columns:1fr 1fr}.tb>div{border-left:0;border-top:1px solid var(--line-2)}.tb>div:first-child{grid-column:1/-1;border-top:0}}
+
+/* action bar */
+.actions{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;border:1px solid var(--line-2);border-radius:7px;background:var(--panel);cursor:pointer;font-size:13.5px;font-weight:500;white-space:nowrap}
+.btn:hover{border-color:var(--ink-3)}
+.btn.primary{background:var(--ink);border-color:var(--ink);color:var(--bg)}
+.btn.sm{height:28px;padding:0 9px;font-size:12.5px}
+.btn.icon{width:28px;padding:0;justify-content:center;color:var(--ink-3)}
+.btn.icon:hover{color:var(--fail);border-color:var(--fail)}
+.actions .sp{flex:1}
+.status{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:var(--ink-2)}
+.status i{width:8px;height:8px;border-radius:50%;background:var(--pass)}
+.status.bad i{background:var(--fail)}
+
+/* panels */
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:4px}
+.panel>header{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 16px;padding:12px 16px;border-bottom:1px solid var(--line)}
+.panel>header h2{font-size:22px;font-weight:600}
+.panel>header .note{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-left:auto}
+.panel .body{padding:14px 16px}
+.tabs{display:flex;gap:2px;padding:0 8px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tab{border:0;background:none;padding:10px 12px;cursor:pointer;color:var(--ink-2);border-bottom:2.5px solid transparent;font-weight:500;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab .cnt{font-family:var(--f-mono);font-size:11px;color:var(--ink-3);margin-left:4px}
+
+/* forms */
+.form{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px 18px}
+.fld label{display:block;font-size:12.5px;color:var(--ink-2);margin-bottom:4px}
+.fld input,.fld select{width:100%;height:34px;border:1px solid var(--line-2);border-radius:6px;background:var(--input);padding:0 9px}
+.fld small{display:block;color:var(--ink-3);font-size:11.5px;margin-top:3px}
+.fld .unit{position:relative}
+.fld .unit span{position:absolute;right:9px;top:50%;transform:translateY(-50%);font-family:var(--f-mono);font-size:11.5px;color:var(--ink-3);pointer-events:none}
+.fgroup{margin-top:18px}
+.fgroup h3{font-size:16px;font-weight:600;margin-bottom:10px;color:var(--ink-2)}
+input:focus,select:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:-1px}
+
+/* tables */
+.tw{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--ink-3);font-weight:500;text-align:left;padding:7px 8px;border-bottom:1px solid var(--line-2);white-space:nowrap;background:var(--panel)}
+td{padding:4px 8px;border-bottom:1px solid var(--line);vertical-align:middle}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.num{font-family:var(--f-mono);font-size:12.5px}
+table.edit td{padding:3px 4px}
+table.edit input[type=text],table.edit input[type=number],table.edit select,table.edit textarea{width:100%;min-width:60px;height:30px;border:1px solid transparent;border-radius:5px;background:transparent;padding:0 6px}
+table.edit textarea{height:30px;resize:none;overflow:hidden;padding:5px 6px;line-height:1.3;min-width:140px;display:block}
+table.edit input:hover,table.edit select:hover,table.edit textarea:hover{border-color:var(--line-2)}
+table.edit input:focus,table.edit textarea:focus{background:var(--input)}
+table.edit input[type=number]{text-align:right;font-family:var(--f-mono);font-size:12.5px}
+table.edit input.bad{border-color:var(--fail);background:var(--fail-soft)}
+tr.sub td{background:var(--panel-2);border-bottom:1px solid var(--line-2);padding:6px 8px}
+tr.sub input{font-weight:600;font-size:14px}
+tr.sub .subtools{display:flex;gap:6px;justify-content:flex-end;align-items:center}
+tr.nonsaf td{color:var(--ink-3)}
+.pill{display:inline-block;font-family:var(--f-mono);font-size:10.5px;font-weight:600;padding:2px 7px;border-radius:4px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap}
+.pill.pass{background:var(--pass-soft);color:var(--pass)}
+.pill.fail{background:var(--fail-soft);color:var(--fail)}
+.pill.warn{background:var(--warn-soft);color:var(--warn)}
+.pill.na{background:var(--panel-2);color:var(--ink-3)}
+.cfg{font-family:var(--f-mono);font-size:12px;padding:1px 6px;border-radius:4px;background:var(--panel-2);white-space:nowrap}
+.inbar{min-width:150px;display:flex;align-items:center;gap:8px}
+.inbar i{display:block;height:8px;max-width:90px;background:var(--bar);border-radius:2px;opacity:.85}
+.inbar span{min-width:46px;text-align:right}
+.tfoot td{font-weight:600;border-top:1.5px solid var(--ink-3);background:var(--panel-2)}
+.issues{margin:0 0 12px;padding:10px 14px;border:1px solid var(--fail);background:var(--fail-soft);color:var(--fail);border-radius:6px;font-size:13px}
+.issues ul{margin:4px 0 0;padding-left:18px}
+.toolrow{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:10px}
+.toolrow input[type=search]{height:32px;border:1px solid var(--line-2);border-radius:6px;background:var(--input);padding:0 10px;min-width:220px}
+.toolrow label{display:inline-flex;gap:6px;align-items:center;font-size:13px;color:var(--ink-2)}
+
+/* results */
+.jump{position:sticky;top:0;z-index:5;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center;padding:8px 2px;background:var(--bg);font-size:13px}
+.jump b{font-family:var(--f-mono);font-size:11px;letter-spacing:.08em;color:var(--ink-3);font-weight:500}
+.jump a{color:var(--ink-2);text-decoration:none;border-bottom:1px dotted var(--line-2)}
+.jump a:hover{color:var(--accent)}
+.kpis{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:10px}
+.kpi{border:1px solid var(--line);border-radius:6px;padding:12px 14px;background:var(--panel)}
+.kpi .l{font-size:12px;color:var(--ink-3)}
+.kpi .v{font-family:var(--f-disp);font-size:32px;font-weight:600;line-height:1.1;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:12px;color:var(--ink-2);margin-top:4px;display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.kpi.pass{border-color:var(--pass)} .kpi.fail{border-color:var(--fail)}
+.chart{width:100%;display:block}
+.chart text{font-family:var(--f-mono);font-size:11px;fill:var(--ink-2)}
+.chart .lbl{font-family:var(--f-body);font-size:12px;fill:var(--ink)}
+.chart .ax{stroke:var(--line-2)}
+.chart .gr{stroke:var(--grid)}
+.two{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px}
+@media (max-width:1000px){.two{grid-template-columns:1fr}}
+.rbdwrap{overflow-x:auto;padding-bottom:6px}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-2);margin-top:8px}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:2px;vertical-align:-2px;margin-right:5px}
+.heat{display:grid;grid-template-columns:28px repeat(10,1fr);gap:2px;font-family:var(--f-mono);font-size:11px;max-width:460px}
+.heat div{aspect-ratio:1.4;display:grid;place-items:center;border-radius:2px}
+.heat .ax{color:var(--ink-3);background:none}
+.method p,.method li{color:var(--ink-2);max-width:95ch}
+.method h3{font-size:17px;margin:16px 0 4px}
+.method code{font-family:var(--f-mono);font-size:12.5px;background:var(--panel-2);padding:1px 5px;border-radius:3px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:9px 16px;border-radius:8px;font-size:13.5px;z-index:50;box-shadow:0 8px 30px rgba(0,0,0,.25)}
+
+/* print: results only */
+@media print{
+  @page{size:A4;margin:14mm}
+  body{background:#fff;color:#000;font-size:11px}
+  .actions,.jump,#inputs,.noprint,.btn{display:none!important}
+  .panel{border:0;break-inside:avoid-page;page-break-inside:avoid}
+  .panel>header{padding:6px 0;border-bottom:1.5px solid #000}
+  .panel .body{padding:8px 0}
+  .sheet{padding:0;gap:10px}
+  .tw{overflow:visible}
+  #r-method,#r-verify{break-before:page}
+}
+</style>
+</head>
+<body>
+<div class="sheet">
+
+  <header class="tb">
+    <div><label for="p-name">Project</label><input class="big" id="p-name" data-p="name"></div>
+    <div><label for="p-system">System</label><input id="p-system" data-p="system"></div>
+    <div><label for="p-doc">Document ref.</label><input id="p-doc" data-p="docRef"></div>
+    <div><label>Model</label><div style="font-weight:600;padding-top:3px">RAMS Phase 1 <span class="pill warn">beta</span></div></div>
+    <div><label>Result</label><div class="res" id="tb-result">—</div></div>
+  </header>
+
+  <div class="actions">
+    <button class="btn" id="b-import" title="Equipment list / FMECA from Excel">Import Excel</button>
+    <button class="btn" id="b-template">Download Excel template</button>
+    <button class="btn primary" id="b-export">Export results (Excel)</button>
+    <button class="btn" id="b-json">Save inputs (JSON)</button>
+    <button class="btn" id="b-jsonin">Open inputs (JSON)</button>
+    <button class="btn" id="b-print">Print / PDF report</button>
+    <button class="btn" id="b-sample">Reset to sample</button>
+    <span class="sp"></span>
+    <span class="status" id="status"><i></i><span>Ready</span></span>
+    <input type="file" id="f-xlsx" accept=".xlsx,.xls,.xlsm,.csv" hidden>
+    <input type="file" id="f-json" accept=".json" hidden>
+  </div>
+
+  <section class="panel" id="inputs">
+    <header><h2>Input data</h2><span class="note">All values editable · saved in this browser · results update as you type</span></header>
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" data-tab="t-project" aria-selected="true">Project & targets</button>
+      <button class="tab" role="tab" data-tab="t-equip" aria-selected="false">Equipment & redundancy <span class="cnt" id="cnt-equip"></span></button>
+      <button class="tab" role="tab" data-tab="t-fmeca" aria-selected="false">FMECA register <span class="cnt" id="cnt-fmeca"></span></button>
+    </div>
+
+    <div class="body" id="t-project" role="tabpanel">
+      <div class="fgroup" style="margin-top:0"><h3>Operating profile</h3>
+        <div class="form">
+          <div class="fld"><label for="p-hpd">Operating hours per day</label><div class="unit"><input id="p-hpd" type="number" min="0" max="24" step="0.5" data-p="hoursPerDay"><span>h</span></div></div>
+          <div class="fld"><label for="p-dpy">Operating days per year</label><div class="unit"><input id="p-dpy" type="number" min="0" max="366" step="1" data-p="daysPerYear"><span>d</span></div></div>
+          <div class="fld"><label for="p-mis">Mission time for reliability</label><div class="unit"><input id="p-mis" type="number" min="0" step="1" data-p="missionHours"><span>h</span></div><small>e.g. one operating day</small></div>
+          <div class="fld"><label>Operating hours per year</label><div class="mono" id="p-opy" style="padding-top:7px;font-size:15px">—</div></div>
+        </div>
+      </div>
+      <div class="fgroup"><h3>Targets & allocation</h3>
+        <div class="form">
+          <div class="fld"><label for="t-a">Target system availability</label><div class="unit"><input id="t-a" type="number" min="0" max="100" step="0.001" data-t="availability"><span>%</span></div><small>Service-affecting failures only</small></div>
+          <div class="fld"><label for="t-m">Target MTBSAF</label><div class="unit"><input id="t-m" type="number" min="0" step="1" data-t="mtbsaf"><span>h</span></div><small>Mean operating time between service-affecting failures</small></div>
+          <div class="fld"><label for="t-alloc">Allocation method</label><select id="t-alloc" data-t="allocation"><option value="arinc">ARINC (proportional to failure rate)</option><option value="equal">Equal apportionment</option><option value="weighted">Weighted (subsystem weights)</option></select><small>Splits the system targets between subsystems</small></div>
+          <div class="fld"><label for="t-rpn">FMECA action threshold</label><div class="unit"><input id="t-rpn" type="number" min="1" max="1000" step="1" data-t="rpnThreshold"><span>RPN</span></div><small>Action if RPN ≥ threshold or severity ≥ 9</small></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="body" id="t-equip" role="tabpanel" hidden>
+      <div class="issues" id="issues" hidden></div>
+      <div class="toolrow"><button class="btn sm" id="b-addsub">+ Add subsystem</button><span class="muted" style="font-size:12.5px">Qty = units installed (n); Required = units needed for service (k). k = n is series, k &lt; n is redundancy. Untick SAF for failures that do not affect service.</span></div>
+      <div class="tw"><table class="edit" id="equip"></table></div>
+    </div>
+
+    <div class="body" id="t-fmeca" role="tabpanel" hidden>
+      <div class="toolrow">
+        <button class="btn sm" id="b-addf">+ Add failure mode</button>
+        <input type="search" id="f-q" placeholder="Filter failure modes…" aria-label="Filter failure modes">
+        <label><input type="checkbox" id="f-act"> Action required only</label>
+        <label>Sort <select id="f-sort" style="height:30px;border:1px solid var(--line-2);border-radius:6px;background:var(--input)"><option value="">as entered</option><option value="rpn">RPN high → low</option><option value="S">Severity high → low</option></select></label>
+        <span class="muted" style="font-size:12.5px">S, O, D on 1–10 scales</span>
+      </div>
+      <div class="tw"><table class="edit" id="fmeca"></table></div>
+    </div>
+  </section>
+
+  <nav class="jump" aria-label="Results">
+    <b>RESULTS</b>
+    <a href="#r-summary">Summary</a><a href="#r-rbd">Block diagram</a><a href="#r-rollup">Roll-up</a><a href="#r-alloc">Allocation</a>
+    <a href="#r-pareto">Contributors</a><a href="#r-rel">Reliability</a><a href="#r-fm">FMECA</a><a href="#r-verify">Verification</a><a href="#r-method">Method</a>
+  </nav>
+
+  <section class="panel" id="r-summary"><header><h2>Summary</h2><span class="note" id="sum-note"></span></header><div class="body"><div class="kpis" id="kpis"></div></div></section>
+  <section class="panel" id="r-rbd"><header><h2>Reliability block diagram</h2><span class="note">Subsystems in series · service-affecting items · border: against allocated availability</span></header><div class="body"><div class="rbdwrap" id="rbd"></div><div class="legend"><span><i style="background:var(--pass)"></i>meets allocation</span><span><i style="background:var(--fail)"></i>below allocation</span><span><span class="cfg">k/n</span> units required / installed</span></div></div></section>
+  <section class="panel" id="r-rollup"><header><h2>Availability roll-up</h2><span class="note">Per item and subsystem · downtime per operating year</span></header><div class="body tw" id="rollup"></div></section>
+  <section class="panel" id="r-alloc"><header><h2>Target allocation</h2><span class="note" id="alloc-note"></span></header><div class="body"><div class="two"><div class="tw" id="alloc"></div><div><svg class="chart" id="alloc-chart" role="img" aria-label="Downtime against allocated budget per subsystem"></svg></div></div></div></section>
+  <section class="panel" id="r-pareto"><header><h2>Largest contributors to downtime</h2><span class="note">Share of system unavailability (improvement potential)</span></header><div class="body"><svg class="chart" id="pareto" role="img" aria-label="Contribution to system downtime by item"></svg></div></section>
+  <section class="panel" id="r-rel"><header><h2>Mission reliability</h2><span class="note">Probability of no service-affecting failure, no repair during the mission</span></header><div class="body"><svg class="chart" id="relchart" role="img" aria-label="System reliability against operating time"></svg></div></section>
+  <section class="panel" id="r-fm"><header><h2>FMECA summary</h2><span class="note" id="fm-note"></span></header><div class="body"><div class="two"><div><h3 style="font-size:15px;margin-bottom:8px">Severity × occurrence (count of failure modes)</h3><div id="heat"></div></div><div class="tw" id="fm-top"></div></div></div></section>
+  <section class="panel" id="r-verify"><header><h2>Verification</h2><span class="note" id="ver-note"></span></header><div class="body tw" id="verify"></div></section>
+
+  <section class="panel method" id="r-method"><header><h2>Method & assumptions</h2></header><div class="body">
+    <p>Phase 1 model. Availability is the steady-state inherent availability for <b>service-affecting failures (SAF)</b>; non-SAF items count only towards the maintenance failure rate.</p>
+    <h3>Structure</h3>
+    <p>System = subsystems in series. Subsystem = items in series. Item = <code>k</code>-out-of-<code>n</code> identical units in active redundancy, each repaired independently (one repair team per failed unit). Units are assumed independent: no common-cause failure, no standby switching failure, no repair queue.</p>
+    <h3>Formulas</h3>
+    <ul>
+      <li>Unit: <code>A = MTBF / (MTBF + MTTR)</code>, <code>λ = 1 / MTBF</code>.</li>
+      <li>k-out-of-n: <code>A = Σ_{j=k..n} C(n,j) a^j (1−a)^(n−j)</code>; failure frequency <code>f = n·a·λ·C(n−1,k−1)·a^(k−1)·(1−a)^(n−k)</code>.</li>
+      <li>Series: <code>A = Π A_i</code>, <code>f = A · Σ f_i / A_i</code> (frequency balancing, Billinton &amp; Allan).</li>
+      <li>MTBSAF (mean up time) <code>= A / f</code>; equivalent MTTR (mean down time) <code>= (1 − A) / f</code>; downtime per year <code>= (1 − A) × operating hours × 60</code> min.</li>
+      <li>Mission reliability: unit <code>R = exp(−t / MTBF)</code> combined through the same structure, without repair.</li>
+      <li>Contribution: improvement potential <code>A_sys(item perfect) − A_sys</code>, shown as a share of the total.</li>
+    </ul>
+    <h3>Allocation</h3>
+    <ul>
+      <li>Equal: <code>A_i = A_T^(1/n)</code>, <code>MTBSAF_i = n · MTBSAF_T</code>.</li>
+      <li>ARINC: weights <code>w_i = λ_i / Σλ</code> with <code>λ_i = f_i / A_i</code> from the current design; <code>A_i = A_T^(w_i)</code>, <code>MTBSAF_i = MTBSAF_T / w_i</code>.</li>
+      <li>Weighted: as ARINC with the subsystem weights entered in the equipment table.</li>
+    </ul>
+    <h3>FMECA</h3>
+    <p>RPN = Severity × Occurrence × Detection, each on 1–10. A failure mode needs action when RPN ≥ the threshold or severity ≥ 9.</p>
+    <h3>Not in Phase 1</h3>
+    <p>Fault trees, Markov models with shared repair or standby, common-cause (β-factor), hazard log and SIL/THR apportionment, logistic delay and spares. Results should be reviewed by a RAM engineer before use in a submission.</p>
+  </div></section>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="rams_engine.js"></script>
+<script src="rams_tests.js"></script>
+<script src="rams_sample.js"></script>
+<script src="rams_app.js"></script>
+</body>
+</html>

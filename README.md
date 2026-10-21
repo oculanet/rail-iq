@@ -41,7 +41,11 @@ serve.ps1                  Local static server for Windows
 |---|---|---|---|
 | DC Traction Power Model | Live | Traction Power | `modules/dc-traction-power/TPS_Model.html` |
 | APM Onboard Telecom Layout | Live | Telecom & Radio | `modules/apm-onboard-telecom/index.html` |
-| AC 25 kV Traction Power, Train Performance, CBTC Headway, Radio Coverage, Timetable & Fleet, Tram OCS, Passenger Flow, Tunnel Ventilation, RAMS, Noise & Vibration | Pipeline | various | — |
+| RAMS & Availability (Phase 1) | Beta | Systems Assurance | `modules/rams/index.html` |
+| AC 25 kV Traction Power, Train Performance, CBTC Headway, Radio Coverage, Timetable & Fleet, Tram OCS, Passenger Flow, Tunnel Ventilation, Noise & Vibration | Pipeline | various | — |
+
+**RAMS Phase 1** (`modules/rams/`): `rams_engine.js` (calculation), `rams_tests.js` (verification cases shown in the app),
+`rams_sample.js` (illustrative sample model), `rams_app.js` (page). Method and assumptions are listed at the bottom of the page.
 
 See `modules/dc-traction-power/README.md` for the traction power model's inputs, method and Python usage.
 

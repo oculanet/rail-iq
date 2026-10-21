@@ -198,14 +198,27 @@ window.RAILIQ_CATALOG = [
   {
     id: "rams",
     title: "RAMS & Availability",
-    summary: "Reliability block diagrams, system availability and failure-mode registers.",
-    description: "Availability modelling for railway systems — reliability block diagrams, MTBF / MTTR roll-up and service-affecting failure rates.",
+    summary: "Service availability, MTBSAF and target allocation from an equipment list with k-out-of-n redundancy, plus an FMECA register.",
+    description: "Phase 1 RAM model. Builds the system as subsystems in series, each made of items with k-out-of-n redundancy and independent repair, and computes steady-state availability, MTBSAF, equivalent MTTR, downtime per year and mission reliability for service-affecting failures. Allocates system targets to subsystems (equal, ARINC or weighted), ranks the largest contributors to downtime and keeps an FMECA register with RPN and a severity × occurrence matrix. A built-in verification tab checks the engine against closed-form results and brute-force state enumeration. Beta: results to be reviewed by a RAM engineer before use in a submission.",
     domains: ["metro", "lrt", "tram", "apm", "mainline", "hsr", "monorail"],
     discipline: "assurance",
-    status: "planned",
-    standards: ["EN 50126-1", "EN 50126-2", "IEC 61078"],
-    features: ["RBD builder", "Availability allocation", "FMECA register"],
-    outputs: ["Availability", "Critical items list"]
+    status: "beta",
+    entry: "modules/rams/index.html",
+    version: "Phase 1 (beta)",
+    updated: "2026-10-20",
+    standards: ["EN 50126-1", "EN 50126-2", "IEC 61078", "IEC 60812"],
+    features: [
+      "Equipment table: quantity, units required (k-out-of-n), MTBF, MTTR, service-affecting flag",
+      "System availability, MTBSAF, equivalent MTTR, downtime per year, failures per year",
+      "Reliability block diagram drawn from the equipment table",
+      "Target allocation to subsystems: equal, ARINC or weighted",
+      "Largest contributors to downtime and mission reliability curve",
+      "FMECA register with RPN, action flag and severity × occurrence matrix",
+      "Excel template import / export, JSON inputs, printable report",
+      "Verification tab: engine checked against closed-form and brute-force results"
+    ],
+    outputs: ["Availability roll-up", "Allocation table", "Block diagram", "Pareto of contributors", "FMECA summary", "Excel workbook", "PDF report"],
+    resources: []
   },
   {
     id: "noise-vibration",
