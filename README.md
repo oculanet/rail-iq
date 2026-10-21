@@ -17,6 +17,19 @@ Then open <http://localhost:8080>. No Python or Node needed.
 
 **Option 3 — GitHub Pages.** Push the repository, then *Settings → Pages → Deploy from branch → main / root*. Everything is static with relative paths, so it works as-is.
 
+## Sign-in (password protection)
+
+Every page and file needs a username and password (HTTP Basic sign-in, checked on the server).
+
+- **Vercel:** `middleware.js` runs before any file is sent. Users come from the environment variable
+  `RAILIQ_USERS` (Project → Settings → Environment Variables), formatted `user1:password1,user2:password2`.
+  Set it for Production and Preview, then redeploy. If the variable is missing the site stays locked.
+- **Local server:** `serve.ps1` reads `.railiq-users` (one `user:password` per line). The file is in
+  `.gitignore` and is never served. Without it the local server is open.
+- **Double-clicking `index.html`** opens files straight from disk, with no sign-in.
+- Passwords are never stored in this repository. Keep the GitHub repository **private**, otherwise the
+  source files can be read on GitHub whatever the website does.
+
 ## Structure
 
 ```

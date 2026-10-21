@@ -1,0 +1,6 @@
+{
+  "name": "rail-iq",
+  "private": true,
+  "description": "Rail-IQ railway systems simulation portal (static site; middleware.js adds sign-in on Vercel)",
+  "type": "module"
+}
